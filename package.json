@@ -1,9 +1,9 @@
 {
-  "name": "test-react-oidc",
+  "name": "classee-cloud",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://cobraz.github.io/example-oidc-react",
-  "repository": "github:cobraz/example-oidc-react",
+  "homepage": "",
+  "repository": "",
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -35,10 +35,14 @@
     "@types/node": "^12.0.0",
     "@types/react": "^16.9.0",
     "@types/react-dom": "^16.9.0",
+    "boostrap": "^2.0.0",
+    "bootstrap": "^5.2.3",
     "oidc-react": "^1.0.1",
     "react": "^16.13.1",
+    "react-bootstrap": "^2.7.0",
     "react-dom": "^16.13.1",
-    "react-scripts": "3.4.1",
+    "react-router-dom": "^6.6.2",
+    "react-scripts": "^5.0.1",
     "typescript": "~3.7.2"
   },
   "devDependencies": {
