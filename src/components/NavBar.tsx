@@ -1,6 +1,7 @@
 import React from 'react'
 import {Container, Nav, Navbar as Navbarbs, NavItem} from 'react-bootstrap'
 import {NavLink} from "react-router-dom"
+import Navbar from 'react-bootstrap/Navbar';
 import { useAuth } from 'oidc-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,8 +14,10 @@ const NavBar = () => {
     const LoggedIn = () => {
         console.log(auth)
         if (auth && auth.userData) {
+            console.log(auth.userData)
           return (
             <div>
+                Hi 
               <button 
               style={{float: 'right'}}
               onClick={() => {
@@ -35,15 +38,18 @@ const NavBar = () => {
     return (
         <Navbarbs className='shadow-sm navbar'>
             <Container>
-                <Nav className='ml-auto'>
+                
                     <Nav.Link to="/" as={NavLink}>
                         <h1><p style={{color:"white"}}>Classee Cloud</p></h1>
                     </Nav.Link>
 
-                    <NavItem to="/" as={NavLink}>
-                        <LoggedIn />    
-                    </NavItem>
-                </Nav>
+                    <Navbar.Collapse className="justify-content-end">
+                        <Navbar.Text>
+                        <NavItem to="/" as={NavLink}> <LoggedIn />  </NavItem>        
+                        </Navbar.Text>
+                    </Navbar.Collapse>
+                    
+                
             </Container>
         </Navbarbs>
     )
