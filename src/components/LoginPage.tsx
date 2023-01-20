@@ -1,52 +1,92 @@
-import React, { useState, useEffect } from 'react'
-import { Container } from 'react-bootstrap'
-import Form from 'react-bootstrap/Form'
-import Button from 'react-bootstrap/Button';
+import { useOidc } from '@axa-fr/react-oidc';
+import { useState } from "react";
+import {
+  Flex,
+  Heading,
+  Input,
+  Button,
+  InputGroup,
+  Stack,
+  InputLeftElement,
+  chakra,
+  Box,
+  Link,
+  FormControl,
+  InputRightElement
+} from "@chakra-ui/react";
+import { FaUserAlt, FaLock } from "react-icons/fa";
 
+const CFaUserAlt = chakra(FaUserAlt);
+const CFaLock = chakra(FaLock);
 
-import "./LoginPage.css"
-import { useFormAction, useNavigate} from 'react-router-dom';
-import NavBar from './NavBar';
+const App = () => {
+    const [showPassword, setShowPassword] = useState(false);
 
+    const { login, logout, isAuthenticated} = useOidc();
+    const handleShowClick = () => setShowPassword(!showPassword);
 
-const LoginPage = () => {
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
-    let navigate = useNavigate();
 
     const handleSubmit = (e:React.SyntheticEvent) => {
         e.preventDefault();
         console.log(email, password);
         setEmail("");
         setPassword("");
-        navigate("/");
-        window.location.reload();
+        login('/');
     }
 
-    /*
-    <Form.Group className="mb-3" controlId="formEmail">
-                    <Form.Control type="email" placeholder="Enter email" value={email} onChange={e => setEmail(e.target.value)} />
-                </Form.Group>
+  return (
+    <Flex flexDirection="column" width="100wh" height="100vh" backgroundColor="white" justifyContent="center" alignItems="center">
+      <Stack
+        flexDir="column"
+        mb="2"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Heading color="teal.500">Classee Cloud</Heading>
+        <Box minW={{ base: "90%", md: "468px" }}>
+          <form>
+            <Stack spacing={4} p="1rem" backgroundColor="whiteAlpha.900" boxShadow="md">
+              <FormControl>
+                <InputGroup>
+                  <InputLeftElement pointerEvents="none" children={<CFaUserAlt color="gray.300" />} />
+                  <Input type="email" placeholder="email address" />
+                </InputGroup>
+              </FormControl>
+              <FormControl>
+                <InputGroup>
+                  <InputLeftElement
+                    pointerEvents="none"
+                    color="gray.300"
+                    children={<CFaLock color="gray.300" />}
+                  />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                  />
+                  <InputRightElement width="4.5rem">
+                    <Button h="1.75rem" size="sm" onClick={handleShowClick}>
+                      {showPassword ? "Hide" : "Show"}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+              <Button
+                borderRadius={0}
+                type="submit"
+                variant="solid"
+                colorScheme="teal"
+                width="full"
+                onClick={handleSubmit}>
+                Login
+              </Button>
+            </Stack>
+          </form>
+        </Box>
+      </Stack>
+    </Flex>
+  );
+};
 
-                <Form.Group className="mb-3" controlId="formPassword">
-                    <Form.Control type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} />
-                </Form.Group>
-    */
-
-    return (
-        <>
-        <NavBar/>
-        <Container className="loginpage-container">
-            <br/>
-            <Form className="sign-in-form" onSubmit={handleSubmit}>
-                <label>This is landing page of the webiste.</label> 
-                <Button variant="primary" type="submit">
-                    Click to Login
-                </Button>
-            </Form>
-        </Container>
-        </>
-    )
-}
-
-export default LoginPage;
+export default App;

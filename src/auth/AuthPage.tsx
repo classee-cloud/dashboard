@@ -1,48 +1,44 @@
 import React from 'react'
-import { useAuth } from 'oidc-react';
-import { AuthProvider } from 'oidc-react';
-import {Routes, Route} from "react-router-dom"
-import Dashboard from '../components/Dashboard';
+import { OidcProvider } from '@axa-fr/react-oidc';
+import { useOidc } from '@axa-fr/react-oidc';
+
+import HomePage from '../components/HomePage';
+import { ChakraProvider } from '@chakra-ui/react'
+import {BrowserRouter } from "react-router-dom"
 import LoginPage from '../components/LoginPage';
-import About from '../components/About';
+import {Configuration} from './Configuration';
 
 
 const LoggedIn = () => {
-  const auth = useAuth();
-  if (auth && auth.userData) {
-    console.log(auth)
+  const { login, logout, isAuthenticated} = useOidc();
+  if (isAuthenticated) {
+    console.log(isAuthenticated, login, logout)
     return (
       <div>
-        <strong>Logged in! 🎉</strong><br />
-        <button onClick={() => auth.signOut()}>Log out!</button>
+        <HomePage/>
       </div>
     );
   }
-  return <div>Not logged in! Try to refresh to be redirected to Login Page.</div>;
+  else{
+    return (
+      <div>
+        <LoginPage/>
+      </div>
+    );
+  }
 };
 
-function AuthPage() {
-  let pathVar = "/authentication/callback"
-  const oidcConfig = {
-    onSignIn: (user: any) => {
-      window.location.hash = '';
-    },
-    authority: 'https://auth.in.ripley.cloud/application/o/classee-cloud/',
-    clientId:'4e415fd4f72514cd128d56114bb52c84ec7330c7',
-    responseType: 'id_token',
-    redirectUri: window.location.origin + pathVar,
-  };
 
+
+function AuthPage() {
   return (
-    <AuthProvider {...oidcConfig}>
-      <Routes>
-        <Route path='/' element={<LoginPage/>} />
-        <Route path={pathVar} element={<Dashboard/>} />
-        <Route path='/dashboard' element={<Dashboard/>} />
-        <Route path={pathVar+ '/dashboard'} element={<Dashboard/>} />
-        <Route path={'/about'} element={<About/>} />
-      </Routes>
-    </AuthProvider>
+    <OidcProvider configuration={Configuration} >
+      <BrowserRouter>
+        <ChakraProvider>
+          <LoggedIn/>
+        </ChakraProvider>
+      </BrowserRouter>
+    </OidcProvider>
   );
 }
 

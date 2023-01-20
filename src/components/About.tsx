@@ -1,19 +1,12 @@
-import React from "react";
-import { Container } from "react-bootstrap";
-import NavigationComponents from "./NavigationComponents";
+import React from "react"
+import { Container } from 'react-bootstrap';
 
-function About() {
-    return (
-    <>
-        <NavigationComponents />
-        <div style={{marginLeft:200, color:"blue"}}> 
+export default function About() {
+    return(
+        <div style={{color:"blue"}}> 
             <Container>
-                About page
-            </Container>
+                About
+            </Container>        
         </div>
-    </>
     );
-
-}
-
-export default About;
+  }
