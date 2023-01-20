@@ -1,5 +1,4 @@
-import React, { ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React from 'react';
 import { OidcSecure } from '@axa-fr/react-oidc';
 import { useOidc } from '@axa-fr/react-oidc';
 
@@ -12,10 +11,7 @@ import {
   Icon,
   useColorModeValue,
   Link,
-  Drawer,
-  DrawerContent,
   Text,
-  useDisclosure,
   BoxProps,
   FlexProps,
   Menu,
@@ -27,8 +23,6 @@ import {
 import { FiHome, FiCompass, FiMenu, } from 'react-icons/fi';
 import { IconType } from 'react-icons';
 import { ReactText } from 'react';
-import { Nav } from 'react-bootstrap';
-import {NavLink} from "react-router-dom"
 
 import Profile from './Profile';
 
@@ -114,8 +108,7 @@ export const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 
 
 export const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-    const { login, logout, isAuthenticated} = useOidc();
-    let navigate = useNavigate();
+    const { logout } = useOidc();
 
     const onLogout =() => {
       logout();

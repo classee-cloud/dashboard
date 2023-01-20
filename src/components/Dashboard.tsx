@@ -1,6 +1,6 @@
-import React, { useState, useEffect, ChangeEvent, MouseEvent } from "react"
+import React, { useState, useEffect, ChangeEvent } from "react"
 import { Container } from 'react-bootstrap';
-import { TableContainer, Button,Table, Thead, Tr, Th, Td, Tbody, Link, Checkbox, Tab } from '@chakra-ui/react';
+import { TableContainer, Button,Table, Thead, Tr, Th, Td, Tbody, Link, Checkbox } from '@chakra-ui/react';
 //import { GitData } from "./GitData";
 
 interface TableItems {
