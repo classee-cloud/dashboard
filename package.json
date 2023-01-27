@@ -1,7 +1,7 @@
 {
   "name": "classee-cloud-dashboard",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@axa-fr/react-oidc": "^6.13.3",
     "@chakra-ui/icons": "^2.0.16",

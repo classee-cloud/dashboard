@@ -1,6 +1,9 @@
 import React, { useState, useEffect, ChangeEvent, MouseEvent } from "react"
 import { Container } from 'react-bootstrap';
 import { TableContainer, Button,Table, Thead, Tr, Th, Td, Tbody, Link, Checkbox, Tab } from '@chakra-ui/react';
+import { useDragControls } from "framer-motion";
+import { useActionData } from "react-router-dom";
+import {OidcUserStatus, useOidcUser} from '@axa-fr/react-oidc';
 //import { GitData } from "./GitData";
 
 interface TableItems {
@@ -9,40 +12,31 @@ interface TableItems {
     link: string;
   }
 
-
-
 export default function Dashboard() {
-    const GitData = [
-        {
-            id: "1",
-            name:"Repo 1",
-            link:"Link 1"
-        },
-        {
-            id: "2",
-            name:"Repo 2",
-            link:"Link 2"
-        },
-        {
-            id: "3",
-            name:"Repo 3",
-            link:"Link 3"
-        },
-        {
-            id: "4",
-            name:"Repo 4",
-            link:"Link 4"
-        }
-    ];
+    
+    const [GitData, setGitData] = useState<Array<TableItems>>([]);
+    const {oidcUser, oidcUserLoadingState} = useOidcUser();
 
     const [isCheckAll, setIsCheckAll] = useState<boolean>(false);
     const [isCheck, setIsCheck] = useState<Array<string>>([]);
     const [list, setList] = useState<Array<TableItems>>(GitData);
-    
-    useEffect(() => {
-        setList(list);
-      }, [list]);
 
+    // get this from outh - 
+    const loginName:string = "classee-cloud";
+
+    const userData = async (loginName:string) => {
+        const response = await fetch(`http://localhost:8181/repodetails/${loginName}`);
+        const json = await response.json();
+        console.log(json);
+        setGitData(json);
+    }
+
+    useEffect(() => {
+        userData(loginName);
+        //setList(list);
+      }, []);
+
+    /*
     const handleSelectAll = (e:ChangeEvent<HTMLInputElement>) => {
         setIsCheckAll(!isCheckAll);
         setIsCheck(list.map(li => li.id));
@@ -57,15 +51,12 @@ export default function Dashboard() {
         if (!checked) {
             setIsCheck(isCheck.filter(item => item !== id));
         }
-    }
-
-    console.log(isCheck);
+    } */
       
     const TableEntries = ({name, link, id}:TableItems) => {
         return (
             <Tr>
-                <Td><Checkbox colorScheme='blue' key={id} id={id} isChecked={isCheck.includes(id)} onChange={handleClick}></Checkbox></Td>
-                <Td>{name}</Td>
+                <Td><Checkbox colorScheme='blue' key={id} id={id}></Checkbox> {name}</Td>
                 <Td>
                     <Link href={link} >
                         {link}
@@ -75,37 +66,63 @@ export default function Dashboard() {
         );
     }
 
-    return (
-        <div style={{color:"blue"}}> 
-        <Container>
-            <h2> Github Repositories </h2>
-            <br/>
-
-            <TableContainer>
-            <Table variant='simple'>
-                <Thead>
-                <Tr>
-                    <Th>
-                        <Checkbox colorScheme='blue' isChecked={isCheckAll} onChange={handleSelectAll}/> &nbsp; &nbsp;
-                        Select All     
-                    </Th>
-                    <Th>Repository Name</Th>
-                    <Th>Link</Th>
-                </Tr>
-                </Thead>
-
-                <Tbody>
-                {list.map((e) => (
-                    <TableEntries name={e.name} link={e.link} id={e.id}/>
-                ))}
-
-                </Tbody>
-            </Table>
-            </TableContainer>
-
-            <Button colorScheme='blue'>Trigger CI</Button>
-        </Container>        
-        </div>
-    );
+    switch (oidcUserLoadingState) {
+        case OidcUserStatus.Loading:
+          return (
+            <div style={{color:"blue"}}> 
+                <Container>
+                    <p>User Information are loading</p>;
+                </Container>
+            </div>
+          )
+        case OidcUserStatus.Unauthenticated:
+          return (
+            <div style={{color:"blue"}}> 
+                <Container>
+                    <p>you are not authenticated</p>;
+                </Container>
+            </div>
+          )
+        case OidcUserStatus.LoadingError:
+          return (
+            <div style={{color:"blue"}}> 
+                <Container>
+                    <p>Fail to load user information</p>;
+                </Container>
+            </div>
+          )
+        default:
+            return (
+                <div style={{color:"blue"}}> 
+                <Container>
+                    {JSON.stringify(oidcUser)}
+                    <h2> Github Repositories </h2>
+                    <br/>
+        
+                    <TableContainer>
+                    <Table variant='simple'>
+                        <Thead>
+                        <Tr>
+                            <Th><Checkbox colorScheme='blue'/> &nbsp; &nbsp; 
+                            Repository Name</Th>
+                            <Th>Link</Th>
+                        </Tr>
+                        </Thead>
+        
+                        <Tbody>
+                        {GitData.map((e) => (
+                            <TableEntries name={e.name} link={e.link} id={e.id}/>
+                        ))}
+        
+                        </Tbody>
+                    </Table>
+                    </TableContainer>
+        
+                    <Button colorScheme='blue'>Trigger CI</Button>
+                </Container>        
+                </div>
+            );
+      }
+    
 
     };

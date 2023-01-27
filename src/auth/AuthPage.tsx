@@ -1,5 +1,5 @@
 import React from 'react'
-import { OidcProvider } from '@axa-fr/react-oidc';
+import { OidcProvider, useOidcUser } from '@axa-fr/react-oidc';
 import { useOidc } from '@axa-fr/react-oidc';
 
 import HomePage from '../components/HomePage';
@@ -12,7 +12,7 @@ import {Configuration} from './Configuration';
 const LoggedIn = () => {
   const { login, logout, isAuthenticated} = useOidc();
   if (isAuthenticated) {
-    console.log(isAuthenticated, login, logout)
+    //console.log(isAuthenticated, login, logout)
     return (
       <div>
         <HomePage/>

@@ -6,8 +6,11 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const trustedDomains = {
     default: ['https://auth.in.ripley.cloud/application/o/classee-cloud', 
-    'https://auth.in.ripley.cloud/application/o/classee-cloud/', 
-    'https://auth.in.ripley.cloud/application/o/token/', 
-    'https://auth.in.ripley.cloud/application/o/revoke/',
-    'https://auth.in.ripley.cloud/application/o/userinfo/']
+    'https://auth.in.ripley.cloud/application/o/token', 
+    'https://auth.in.ripley.cloud/application/o/revoke',
+    'https://auth.in.ripley.cloud/application/o/userinfo',
+    'https://auth.in.ripley.cloud/application/o/authorize/',
+    'https://auth.in.ripley.cloud/if/session-end/classee-cloud/',
+    'https://auth.in.ripley.cloud/application/o/introspect/',
+    'https://auth.in.ripley.cloud/application/o/device/' ]
 };
