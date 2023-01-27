@@ -10,7 +10,6 @@ import {
   InputLeftElement,
   chakra,
   Box,
-  Link,
   FormControl,
   InputRightElement
 } from "@chakra-ui/react";
@@ -22,7 +21,7 @@ const CFaLock = chakra(FaLock);
 const App = () => {
     const [showPassword, setShowPassword] = useState(false);
 
-    const { login, logout, isAuthenticated} = useOidc();
+    const { login } = useOidc();
     const handleShowClick = () => setShowPassword(!showPassword);
 
     const [email, setEmail] = useState<string>("")

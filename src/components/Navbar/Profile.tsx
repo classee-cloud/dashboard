@@ -3,7 +3,7 @@ import ProfilePhoto from './ProfilePhoto'
 import {  Box, VStack, Text, HStack } from '@chakra-ui/react';
 import { FiChevronDown } from 'react-icons/fi';
 
-export default function(){
+export default function Profile(){
     return (
         <HStack>
             <ProfilePhoto />

@@ -6,11 +6,10 @@ import About from './About';
 import { Route, Routes } from 'react-router-dom';
 import LoginPage from './LoginPage';
 import { useOidc } from '@axa-fr/react-oidc';
-import { OidcSecure } from '@axa-fr/react-oidc';
 
 
 export default function HomePage() {
-    const { login, logout, isAuthenticated} = useOidc();
+    const { isAuthenticated} = useOidc();
     const { isOpen, onOpen, onClose } = useDisclosure();
   
     return (
