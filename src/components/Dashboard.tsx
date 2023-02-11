@@ -1,9 +1,9 @@
+/* eslint-disable */
+
 import React, { useState, useEffect, ChangeEvent } from "react"
 import { Container } from 'react-bootstrap';
 
 import { TableContainer, Button,Table, Thead, Tr, Th, Td, Tbody, Link, Checkbox, Tab } from '@chakra-ui/react';
-import { useDragControls } from "framer-motion";
-import { useActionData } from "react-router-dom";
 import {OidcUserStatus, useOidcUser} from '@axa-fr/react-oidc';
 //import { GitData } from "./GitData";
 
@@ -13,29 +13,66 @@ interface TableItems {
     link: string;
   }
 
+
+
 export default function Dashboard() {
     
+    const serverDB = "http://localhost:5001";
+    const serviceGithub = "http://localhost:8181";
+
     const [GitData, setGitData] = useState<Array<TableItems>>([]);
+    const [Tokens, setTokens] = useState<object>();
     const {oidcUser, oidcUserLoadingState} = useOidcUser();
 
     const [isCheckAll, setIsCheckAll] = useState<boolean>(false);
     const [isCheck, setIsCheck] = useState<Array<string>>([]);
     const [list, setList] = useState<Array<TableItems>>(GitData);
 
-    // get this from outh - 
-    const loginName:string = "classee-cloud";
+    // initialize token to server
+    // get the access token and refresh token. use state to store
+    // store refresh in cookies
+    const tokens = async () => {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: oidcUser.email,
+                                    name: oidcUser.name,
+                                    sub: oidcUser.sub})
+            };
 
-    const userData = async (loginName:string) => {
-        const response = await fetch(`http://localhost:8181/repodetails/${loginName}`);
+        const response = await fetch(serverDB+`/api/login`, requestOptions);
+        const json = await response.json();
+        //console.log(json);
+        console.log("Token fetched");
+        setTokens(json);
+    }
+    
+    const userData = async () => {
+        console.log("Fetching user data")
+        console.log("Token", Tokens);
+
+        const loginName = oidcUser.preferred_username;
+
+        const requestOptions = {
+            method: 'GET',
+        };
+        const response = await fetch(serviceGithub+`/repodetails/${loginName}/${JSON.stringify(Tokens)}`, requestOptions);
         const json = await response.json();
         console.log(json);
+        console.log("User Github Data fetched");
         setGitData(json);
     }
 
+
     useEffect(() => {
-        userData(loginName);
+        // fetch token
+        if (oidcUserLoadingState == OidcUserStatus.Loaded){
+            tokens();
+        }
         //setList(list);
-      }, []);
+      }, [oidcUserLoadingState]);
+
+      
 
     /*
     const handleSelectAll = (e:ChangeEvent<HTMLInputElement>) => {
@@ -54,18 +91,7 @@ export default function Dashboard() {
         }
     } */
       
-    const TableEntries = ({name, link, id}:TableItems) => {
-        return (
-            <Tr>
-                <Td><Checkbox colorScheme='blue' key={id} id={id}></Checkbox> {name}</Td>
-                <Td>
-                    <Link href={link} >
-                        {link}
-                    </Link>
-                </Td>
-            </Tr>
-        );
-    }
+
 
     switch (oidcUserLoadingState) {
         case OidcUserStatus.Loading:
@@ -92,7 +118,27 @@ export default function Dashboard() {
                 </Container>
             </div>
           )
-        default:
+          
+        case OidcUserStatus.Loaded:
+
+            console.log(GitData);
+            if  (Tokens != undefined && (GitData === undefined || GitData.length == 0)){
+                //fetch user data
+                userData();
+            }
+            
+            const TableEntries = ({name, link, id}:TableItems) => {
+                return (
+                    <Tr>
+                        <Td><Checkbox colorScheme='blue' key={id} id={id}></Checkbox> {name}</Td>
+                        <Td>
+                            <Link href={link} >
+                                {link}
+                            </Link>
+                        </Td>
+                    </Tr>
+                );
+            }
             return (
                 <div style={{color:"blue"}}> 
                 <Container>
@@ -112,7 +158,7 @@ export default function Dashboard() {
         
                         <Tbody>
                         {GitData.map((e) => (
-                            <TableEntries name={e.name} link={e.link} id={e.id}/>
+                            <TableEntries name={e.name} key={e.id} link={e.link} id={e.id}/>
                         ))}
         
                         </Tbody>
@@ -124,6 +170,5 @@ export default function Dashboard() {
                 </div>
             );
       }
-    
 
     };
