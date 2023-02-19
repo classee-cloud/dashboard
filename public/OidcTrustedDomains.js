@@ -12,5 +12,6 @@ const trustedDomains = {
     'https://auth.in.ripley.cloud/application/o/authorize/',
     'https://auth.in.ripley.cloud/if/session-end/classee-cloud/',
     'https://auth.in.ripley.cloud/application/o/introspect/',
-    'https://auth.in.ripley.cloud/application/o/device/' ]
+    'https://auth.in.ripley.cloud/application/o/device/',
+     ]
 };
