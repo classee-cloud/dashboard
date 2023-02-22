@@ -19,8 +19,13 @@ export default class DashboardController {
     private _octokit: Octokit;
 
     public constructor({ userProfile }: ConnectionProperties) {
-        this._serviceDBURL = process.env.REACT_APP_SERVICE_DB || '';
-        this._serviceGitHubURL = process.env.REACT_APP_SERVICE_GITHUB || '';
+        // temp
+        const REACT_APP_SERVICE_DB="http://localhost:5001"
+        const REACT_APP_SERVICE_GITHUB="http://localhost:8181"
+        // 
+        
+        this._serviceDBURL = REACT_APP_SERVICE_DB || '';
+        this._serviceGitHubURL = REACT_APP_SERVICE_GITHUB || '';
         if (this._serviceDBURL === '' || this._serviceGitHubURL === '') {
             throw new Error('Missing environment variables REACT_APP_SERVICE_DB or REACT_APP_SERVICE_GITHUB');
         }

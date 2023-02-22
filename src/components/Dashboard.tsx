@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, ChangeEvent } from "react";
 import { Container } from "react-bootstrap";
-
 import {
   TableContainer,
   Button,
@@ -14,7 +13,6 @@ import {
   Tbody,
   Link,
   Checkbox,
-  Tab,
 } from "@chakra-ui/react";
 import {
   OidcUserStatus,
@@ -25,6 +23,7 @@ import {
 import { Octokit } from "octokit";
 import { useDashboardController } from "../classes/DashboardController";
 //import { GitData } from "./GitData";
+import {useNavigate} from 'react-router-dom';
 
 interface TableItems {
   id: string;
@@ -34,6 +33,7 @@ interface TableItems {
 
 export default function Dashboard() {
   const dashboardController = useDashboardController();
+  const navigate = useNavigate();
 
   const [GitData, setGitData] = useState<Array<TableItems>>([]);
   const [Tokens, setTokens] = useState<object>();
@@ -108,12 +108,22 @@ export default function Dashboard() {
       </Tr>
     );
   };
+
+
+  const navigateHome = () => {
+    // 👇️ navigate to /
+    navigate('/AddRepo');
+  };
+  
   return (
     <div style={{ color: "blue" }}>
       <Container>
-        <h2> Github Repositories </h2>
+
+        <Button colorScheme="blue" onClick={navigateHome}>Add and Configure New Repository</Button>
         <br />
 
+        <h2> Github Repositories </h2>
+        <br />
         <TableContainer>
           <Table variant="simple">
             <Thead>
@@ -138,7 +148,6 @@ export default function Dashboard() {
           </Table>
         </TableContainer>
 
-        <Button colorScheme="blue">Trigger CI</Button>
       </Container>
     </div>
   );

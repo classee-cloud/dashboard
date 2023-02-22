@@ -1,10 +1,11 @@
 import React from "react";
 import { Box, Drawer, DrawerContent, useDisclosure } from "@chakra-ui/react";
 import { SidebarContent, MobileNav } from "./Navbar/NavBar";
+import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import About from "./About";
-import { Route, Routes } from "react-router-dom";
 import LoginPage from "./LoginPage";
+import AddRepo from "./AddRepo";
 
 export default function HomePage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -36,6 +37,7 @@ export default function HomePage() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
+          <Route path="/addrepo" element={<AddRepo />} />
         </Routes>
       </Box>
     </div>
