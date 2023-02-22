@@ -11,14 +11,13 @@ import { Container, Select, Card,  CardBody,
     Link,
     Checkbox,
     Input,
-    Divider
-} from '@chakra-ui/react'
-import {
+    Divider,
     FormControl,
     FormLabel,
     FormErrorMessage,
-    FormHelperText,
-  } from '@chakra-ui/react'
+    FormHelperText
+} from '@chakra-ui/react'
+import ComputeServiceForm from "./ComputeServiceForm";
 
 
 interface SelectOptionEntry {
@@ -35,6 +34,7 @@ interface RepoTable {
   
 export default function AddRepo() {
 
+    // temp - get from database ideally
     let Organization:Array<SelectOptionEntry> = [
         { id: "1", name: "Org1" },
         { id: "2", name: "Org2" },
@@ -56,11 +56,9 @@ export default function AddRepo() {
     ]
 
 
-    //
+    // UseState
     const [selectValue, setSelectValue] = useState<string>("");
     const [allRepositories, setAllRepositories] = useState<Array<RepoTable>>([]);
-    //
-
 
     ///////////////////////////////////////////////////////////////////////
     const TableEntries = ({ name, link, id, org }: RepoTable) => {
@@ -110,7 +108,7 @@ export default function AddRepo() {
     const SelectComputeEntries = () => {
         return (
             <div>
-                <Button>Add New Compute Service</Button>
+                <Button onClick={renderForm}>Add New Compute Service</Button>
                 <br/>
                 <br/>
                 <Select placeholder='Select Compute Service'  onChange={handleComputeSelect}>
@@ -140,6 +138,12 @@ export default function AddRepo() {
 
     const handleComputeSelect = (e:any) => {
         console.log("select");
+    }
+
+    const renderForm = () => {
+        return (
+            <ComputeServiceForm/>
+        )
     }
     
     return(

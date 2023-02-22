@@ -5,7 +5,7 @@ import { Route, Routes } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import About from "./About";
 import LoginPage from "./LoginPage";
-import AddRepo from "./AddRepo";
+import AddRepo from "./AddRepositoryDetails/AddRepo";
 
 export default function HomePage() {
   const { isOpen, onOpen, onClose } = useDisclosure();
