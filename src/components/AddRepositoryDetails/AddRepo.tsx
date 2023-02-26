@@ -1,6 +1,5 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Container, Select, Card,  CardBody, 
-    TableContainer,
     Button,
     Table,
     Thead,
@@ -14,10 +13,10 @@ import { Container, Select, Card,  CardBody,
     Divider,
     FormControl,
     FormLabel,
-    FormErrorMessage,
-    FormHelperText
 } from '@chakra-ui/react'
 import ComputeServiceForm from "./ComputeServiceForm";
+import { useDashboardController } from "../../classes/DashboardController";
+import { Octokit } from "octokit";
 
 
 interface SelectOptionEntry {
@@ -31,34 +30,51 @@ interface RepoTable {
     name: string;
     link: string;
 }
+
+interface Orgs {
+    id: string;
+    name: string;
+    url: string;
+}
+
+interface ComputeService {
+    id: string;
+    name: string;
+}
+
   
 export default function AddRepo() {
-
-    // temp - get from database ideally
-    let Organization:Array<SelectOptionEntry> = [
-        { id: "1", name: "Org1" },
-        { id: "2", name: "Org2" },
-        { id: "3", name: "Org3" }
-    ]
-
-    let Repositories = [
-        { id: "1", org:"Org1", link: "xyz", name:"repo name"},
-        { id: "2", org:"Org1", link: "xyz", name:"repo name"},
-        { id: "3", org:"Org2", link: "xyz", name:"repo name"},
-        { id: "4", org:"Org3", link: "xyz", name:"repo name"}
-    ]
-
-    let ComputeService = [
-        { id: "1", name:"Service name"},
-        { id: "2", name:"Service name"},
-        { id: "3", name:"Service name"},
-        { id: "4", name:"Service name"}
-    ]
-
-
     // UseState
+    const dashboardController = useDashboardController();
     const [selectValue, setSelectValue] = useState<string>("");
+    const [octo, setOcto] = useState<Octokit>(dashboardController.octokit);
+
     const [allRepositories, setAllRepositories] = useState<Array<RepoTable>>([]);
+    const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
+    const [ComputeServices, setComputeServices] = useState<Array<ComputeService>>([]);
+
+
+    
+
+    useEffect(() => {
+        const octokit = dashboardController.octokit;
+        setOcto(octokit);
+
+        var js:Array<Orgs> = [];
+        octokit.request('GET /user').then(({data})=>{
+            js.push({id:data.id.toString(), name:data.login, url:''});
+        })
+        
+        octokit.request('GET /organizations')
+            .then(({ data }) => {
+                data.map((e) => {
+                    js.push({id:e.id.toString(), name:e.login, url:e.url});
+                })
+            setOrganizations(js);
+        });       
+        
+      }, [dashboardController]);
+
 
     ///////////////////////////////////////////////////////////////////////
     const TableEntries = ({ name, link, id, org }: RepoTable) => {
@@ -108,43 +124,57 @@ export default function AddRepo() {
     const SelectComputeEntries = () => {
         return (
             <div>
-                <Button onClick={renderForm}>Add New Compute Service</Button>
-                <br/>
-                <br/>
                 <Select placeholder='Select Compute Service'  onChange={handleComputeSelect}>
-                    {ComputeService.map((e) => <option id={e.id} key={e.id} value={e.id}>{e.name}</option>)}
+                    {ComputeServices.map((e) => <option id={e.id} key={e.id} value={e.id}>{e.name}</option>)}
                 </Select>
                 
             </div>
         )
+    
+        
     }
 
+
     ///////////////////////////////////////////////////////////////////////
+    //Helpers
     const handleSearch = (() => {
         console.log("search");
     });
 
-    const handleSelect = (e:any) => {
+    const handleSelect = async (e:any) => {
         if (e.target.value== ""){
             setSelectValue("");
             setAllRepositories([]);    
+            setComputeServices([]);
         }
         else{
-            const name =  Organization.filter(v => v.id == e.target.value)[0].name;
+            const name =  Organizations.filter(v => v.id == e.target.value)[0].name;
+            const response = await fetch(`http://localhost:8181/repodetails/${name}`);
+            const json = await response.json();
             setSelectValue(name);
-            setAllRepositories(Repositories.filter(e=>e.org == name));
+            setAllRepositories(json);
+
+            const requestOptions = {
+                method: "GET",
+            };
+            const responseCompute = await fetch(`http://localhost:5001/api/computer-service/${name}/`, requestOptions);
+            const jsonCompute = await responseCompute.json();
+            var js:Array<ComputeService> = []
+            jsonCompute.map((e:any) => {
+                js.push({id:e.id, name:e.service_name});
+            })
+            setComputeServices(js);
         }
+
     }
 
     const handleComputeSelect = (e:any) => {
         console.log("select");
     }
 
-    const renderForm = () => {
-        return (
-            <ComputeServiceForm/>
-        )
-    }
+    const admin_id = 1;
+    ///////////////////////////////////////////////////////////////////////
+
     
     return(
         <div> 
@@ -154,7 +184,7 @@ export default function AddRepo() {
                         <FormControl>
                             <FormLabel>Organization</FormLabel>
                             <Select placeholder='Select Organization'  onChange={handleSelect}>
-                                {Organization.map((e) => <option id={e.id} key={e.id} value={e.id}>{e.name}</option>)}
+                                {Organizations.map((e) => <option id={e.id} key={e.id} value={e.id}>{e.name}</option>)}
                             </Select>
                             <br/>
                             <br/>
@@ -163,7 +193,10 @@ export default function AddRepo() {
                     </CardBody>
                     <Divider />
                     <CardBody>
-                        <SelectComputeEntries/>
+                        {selectValue.length > 0 && <ComputeServiceForm admin_id={admin_id} login_id={selectValue} /> }
+                        <br/>
+                        <br/>
+                        {selectValue.length > 0 && <SelectComputeEntries/>}
                     </CardBody>
                 </Card>
             </Container>
