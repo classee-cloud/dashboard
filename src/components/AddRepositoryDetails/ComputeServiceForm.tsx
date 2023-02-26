@@ -21,7 +21,7 @@ import { Container,
 
 export default function ComputeServiceForm({admin_id, login_name}:any) {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const [error, setError] = useState<boolean>(false);
+    const [error, setError] = useState<boolean>(true);
     const [serviceName, setServiceName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -64,9 +64,14 @@ export default function ComputeServiceForm({admin_id, login_name}:any) {
                 })
             };
             //const responseCompute = await fetch(`http://localhost:5001/api/computer-service`, requestOptions);
+            
         }
         else{
             setError(true);
+        }
+
+        if (!error){
+            onClose();
         }
 
     }
