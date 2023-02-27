@@ -20,8 +20,8 @@ export default class DashboardController {
 
     public constructor({ userProfile }: ConnectionProperties) {
         // temp
-        //const REACT_APP_SERVICE_DB="http://localhost:5001"
-        //const REACT_APP_SERVICE_GITHUB="http://localhost:8181"
+        const REACT_APP_SERVICE_DB="http://localhost:5001"
+        const REACT_APP_SERVICE_GITHUB="http://localhost:8181"
         // 
         
         this._serviceDBURL = REACT_APP_SERVICE_DB || '';

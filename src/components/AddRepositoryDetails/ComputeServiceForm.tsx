@@ -19,7 +19,7 @@ import { Container,
 } from '@chakra-ui/react'
 
 
-export default function ComputeServiceForm({admin_id, login_name}:any) {
+export default function ComputeServiceForm({admin_id, login_name, ComputeServices}:any) {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [error, setError] = useState<boolean>(true);
     const [serviceName, setServiceName] = useState<string>("");
@@ -48,6 +48,7 @@ export default function ComputeServiceForm({admin_id, login_name}:any) {
       };
 
     const handleSubmit = async () => {
+        console.log(serviceName, email, password, admin_id, login_name);
         // check if email is valid
         if (validateEmail(email) && password != ""){
             // post to database
@@ -63,17 +64,29 @@ export default function ComputeServiceForm({admin_id, login_name}:any) {
                     login_name: login_name
                 })
             };
-            //const responseCompute = await fetch(`http://localhost:5001/api/computer-service`, requestOptions);
+            const responseCompute = await fetch(`http://localhost:5001/api/computer-service`, requestOptions);
+            console.log(responseCompute);
+            onClose();
             
         }
         else{
             setError(true);
         }
 
-        if (!error){
-            onClose();
-        }
+    }
 
+    const handleComputeSelect = (e:any) => {
+        console.log("select");
+    }
+
+    const SelectComputeEntries = () => {
+        return (
+            <div>
+                <Select placeholder='Select Compute Service'  onChange={handleComputeSelect}>
+                    {ComputeServices.map((e:any) => <option id={e.id} key={e.id} value={e.id}>{e.name}</option>)}
+                </Select>
+            </div>
+        )
     }
 
     return(
@@ -110,6 +123,8 @@ export default function ComputeServiceForm({admin_id, login_name}:any) {
                         </ModalBody>
                     </ModalContent>
                 </Modal>
+                <br/>
+                <SelectComputeEntries/>
             </Container>
         </div>
     );

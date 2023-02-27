@@ -71,8 +71,9 @@ export default function AddRepo() {
                     js.push({id:e.id.toString(), name:e.login, url:e.url});
                 })
             setOrganizations(js);
-        });       
+        });      
         
+        setSelectValue("");
       }, [dashboardController]);
 
 
@@ -130,8 +131,6 @@ export default function AddRepo() {
                 
             </div>
         )
-    
-        
     }
 
 
@@ -173,6 +172,7 @@ export default function AddRepo() {
     }
 
     const admin_id = 1;
+    console.log(selectValue);
     ///////////////////////////////////////////////////////////////////////
 
     
@@ -193,10 +193,7 @@ export default function AddRepo() {
                     </CardBody>
                     <Divider />
                     <CardBody>
-                        {selectValue.length > 0 && <ComputeServiceForm admin_id={admin_id} login_id={selectValue} /> }
-                        <br/>
-                        <br/>
-                        {selectValue.length > 0 && <SelectComputeEntries/>}
+                        {selectValue.length > 0 && <ComputeServiceForm admin_id={admin_id} login_name={selectValue} ComputeServices={ComputeServices} /> }
                     </CardBody>
                 </Card>
             </Container>
