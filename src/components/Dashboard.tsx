@@ -49,7 +49,6 @@ export default function Dashboard() {
             const json = await response.json();
             await json.map((e:any) => {
               setGitData(GitData => [{id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service}])
-              console.log(GitData);
               });     
       })
       
@@ -104,7 +103,7 @@ export default function Dashboard() {
         <br />
         <hr/>
         <br />
-        <h2> Github Repositories </h2>
+        <h2> Configured Github Repositories </h2>
         <br />
 
         {GitData.length <=0 && <h1>loading...</h1>}
