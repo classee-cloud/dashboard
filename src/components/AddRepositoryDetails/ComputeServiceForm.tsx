@@ -17,11 +17,12 @@ import { Container,
     FormErrorMessage,
     Text
 } from '@chakra-ui/react'
+import useFetchGet from "../../utils/useFetchGet";
 
 
-export default function ComputeServiceForm({admin_id, login_name, ComputeServices}:any) {
+export default function ComputeServiceForm({admin_id, login_name}:any) {
     const { isOpen, onOpen, onClose } = useDisclosure()
-    const [error, setError] = useState<boolean>(true);
+    const [errorValue, setError] = useState<boolean>(true);
     const [serviceName, setServiceName] = useState<string>("");
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -66,27 +67,12 @@ export default function ComputeServiceForm({admin_id, login_name, ComputeService
             };
             const responseCompute = await fetch(`http://localhost:5001/api/computer-service`, requestOptions);
             console.log(responseCompute);
-            onClose();
             
         }
         else{
             setError(true);
         }
 
-    }
-
-    const handleComputeSelect = (e:any) => {
-        console.log("select");
-    }
-
-    const SelectComputeEntries = () => {
-        return (
-            <div>
-                <Select placeholder='Select Compute Service'  onChange={handleComputeSelect}>
-                    {ComputeServices.map((e:any) => <option id={e.id} key={e.id} value={e.id}>{e.name}</option>)}
-                </Select>
-            </div>
-        )
     }
 
     return(
@@ -111,7 +97,7 @@ export default function ComputeServiceForm({admin_id, login_name, ComputeService
 
                             <FormLabel>Email</FormLabel>
                             <Input name="email" type='email' onChange={handleEmail} />
-                            {error && <Text color='tomato'>Email ID format is wrong!</Text>}
+                            {errorValue && <Text color='tomato'>Email ID format is wrong!</Text>}
 
                             <FormLabel>Password</FormLabel>
                             <Input name="pswd" type='password' onChange={handlePassword}/>
@@ -124,7 +110,7 @@ export default function ComputeServiceForm({admin_id, login_name, ComputeService
                     </ModalContent>
                 </Modal>
                 <br/>
-                <SelectComputeEntries/>
+                <br/>
             </Container>
         </div>
     );
