@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Container, Select, Card,  CardBody, 
     Button,
     Table,
@@ -13,10 +13,20 @@ import { Container, Select, Card,  CardBody,
     Divider,
     FormControl,
     FormLabel,
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogContent,
+    AlertDialogOverlay,
+    useDisclosure
 } from '@chakra-ui/react'
 import ComputeServiceForm from "./ComputeServiceForm";
-import { useDashboardController } from "../../classes/DashboardController";
+import { ComputeService, useComputeServices, useDashboardController } from "../../classes/DashboardController";
 import { Octokit } from "octokit";
+
+import useFetchGet from "../../utils/useFetchGet";
+import useOctokitFetch from "../../utils/useOctokitFetch";
 
 
 interface SelectOptionEntry {
@@ -37,36 +47,45 @@ interface Orgs {
     url: string;
 }
 
-interface ComputeService {
-    id: string;
-    name: string;
-}
 
   
 export default function AddRepo() {
     // UseState
     const dashboardController = useDashboardController();
     const [selectValue, setSelectValue] = useState<string>("");
+    const [singleChecked, setSingleChecked] = useState<boolean>(false);
+    const [singleCheckedData, setSingleCheckedData] = useState<RepoTable>({"id": "", "name": "", "link": "", "org": ""});
+    const [selectComputeService, setSelectComputeService] = useState<string>("");
+
     const [octo, setOcto] = useState<Octokit>(dashboardController.octokit);
 
     const [allRepositories, setAllRepositories] = useState<Array<RepoTable>>([]);
     const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
     const [ComputeServices, setComputeServices] = useState<Array<ComputeService>>([]);
 
+    const { isOpen, onOpen, onClose } = useDisclosure();
+    const cancelRef = useRef<HTMLDivElement>(null);
+    const closeRef = useRef<HTMLButtonElement>(null);
 
     
+    //const ComputeServices, fetchComputeService = useComputeServices("");
+    const {data, isPending, error, refetch} = useFetchGet("");
+
 
     useEffect(() => {
         const octokit = dashboardController.octokit;
         setOcto(octokit);
 
         var js:Array<Orgs> = [];
-        octokit.request('GET /user').then(({data})=>{
+        octokit.request('GET /user')
+            .then(({data})=>{
             js.push({id:data.id.toString(), name:data.login, url:''});
         })
         
-        octokit.request('GET /organizations')
+        // user/orgs
+        octokit.request('GET /user/orgs')
             .then(({ data }) => {
+                console.log(data);
                 data.map((e) => {
                     js.push({id:e.id.toString(), name:e.login, url:e.url});
                 })
@@ -79,16 +98,43 @@ export default function AddRepo() {
 
     ///////////////////////////////////////////////////////////////////////
     const TableEntries = ({ name, link, id, org }: RepoTable) => {
-        return (
-          <Tr>
-            <Td>
-              <Checkbox colorScheme="blue" key={id} id={id}></Checkbox> {name}
-            </Td>
-            <Td>
-              <Link href={link}>{link}</Link>
-            </Td>
-          </Tr>
-        );
+        if (singleChecked==true && singleCheckedData.name == name){
+            return (
+                <Tr>
+                  <Td>
+                      <Checkbox colorScheme="blue" key={id} id={id} isChecked={singleChecked} onChange={() => handleCheckBox(id, name, link, org) }></Checkbox> {name}
+                  </Td>
+                  <Td>
+                    <Link href={link}>{link}</Link>
+                  </Td>
+                </Tr>
+              );    
+        }
+        else if(singleChecked==true && singleCheckedData.name!=name){
+            return (
+                <Tr>
+                  <Td>
+                      <Checkbox colorScheme="blue" key={id} id={id} disabled={true} onChange={() => handleCheckBox(id, name, link, org) }></Checkbox> {name}
+                  </Td>
+                  <Td>
+                    <Link href={link}>{link}</Link>
+                  </Td>
+                </Tr>
+              );
+        }
+        else{
+            return (
+                <Tr>
+                  <Td>
+                      <Checkbox colorScheme="blue" key={id} id={id} disabled={false} onChange={() => handleCheckBox(id, name, link, org) }></Checkbox> {name}
+                  </Td>
+                  <Td>
+                    <Link href={link}>{link}</Link>
+                  </Td>
+                </Tr>
+              );
+        }
+        
       };
 
     const TableData = () => {
@@ -126,16 +172,31 @@ export default function AddRepo() {
         return (
             <div>
                 <Select placeholder='Select Compute Service'  onChange={handleComputeSelect}>
-                    {ComputeServices.map((e) => <option id={e.id} key={e.id} value={e.id}>{e.name}</option>)}
+                    {ComputeServices.map((e:any) => <option id={e.id} key={e.id} value={e.name}>{e.name}</option>)}
                 </Select>
-                
             </div>
         )
     }
 
-
     ///////////////////////////////////////////////////////////////////////
     //Helpers
+    const handleCheckBox = (id:string, name:string, link:string, org:string) => {
+        if (singleChecked == false){
+            const data = {
+                "id": id,
+                "name": name,
+                "link": link,
+                "org": org
+            }    
+            setSingleCheckedData(data);
+        }
+        else{
+            setSingleCheckedData({"id": "", "name": "", "link": "", "org": ""});
+        }
+        setSingleChecked(!singleChecked);
+            
+    }
+
     const handleSearch = (() => {
         console.log("search");
     });
@@ -144,13 +205,20 @@ export default function AddRepo() {
         if (e.target.value== ""){
             setSelectValue("");
             setAllRepositories([]);    
-            setComputeServices([]);
+            //setComputeServices([]);
+            //dashboardController.refreshComputeServices();
         }
         else{
             const name =  Organizations.filter(v => v.id == e.target.value)[0].name;
+            setSelectValue(name);
+            
+            //await refetch(`http://localhost:8181/repodetails/${name}`);
+            //if (data.length){
+            //    await setAllRepositories(data);
+            //} 
+            
             const response = await fetch(`http://localhost:8181/repodetails/${name}`);
             const json = await response.json();
-            setSelectValue(name);
             setAllRepositories(json);
 
             const requestOptions = {
@@ -162,17 +230,51 @@ export default function AddRepo() {
             jsonCompute.map((e:any) => {
                 js.push({id:e.id, name:e.service_name});
             })
+            
             setComputeServices(js);
-        }
+            //fetchComputeService();
 
+        }
     }
 
     const handleComputeSelect = (e:any) => {
-        console.log("select");
+        console.log(e.target);
+        if (e.target.value== ""){
+            setSelectComputeService("");
+        }
+        else{
+            setSelectComputeService(e.target.value);
+        }
+    }
+
+
+    const handleConfigure = async () => {
+        console.log("configure");
+
+                
+        if (singleCheckedData.name=="" || singleCheckedData.link=="" || singleCheckedData.org=="" || selectComputeService==""){
+            console.log("One or many fields are empty");
+        }
+        else{
+            const requestOptions = {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    repo_name: singleCheckedData.name,
+                    repo_link: singleCheckedData.link,
+                    login_name: singleCheckedData.org,
+                    service_name: selectComputeService
+                })
+            };
+            const responseCompute = await fetch(`http://localhost:5001/api/config_repos`, requestOptions);
+            console.log(responseCompute);
+            setSelectComputeService("");
+            setSingleChecked(false);
+            onOpen();
+        }   
     }
 
     const admin_id = 1;
-    console.log(selectValue);
     ///////////////////////////////////////////////////////////////////////
 
     
@@ -193,9 +295,24 @@ export default function AddRepo() {
                     </CardBody>
                     <Divider />
                     <CardBody>
-                        {selectValue.length > 0 && <ComputeServiceForm admin_id={admin_id} login_name={selectValue} ComputeServices={ComputeServices} /> }
+                        {selectValue.length > 0 && <ComputeServiceForm admin_id={admin_id} login_name={selectValue} /> }
+                        {selectValue.length>0 && <SelectComputeEntries/>}
+                    </CardBody>
+                    <CardBody>
+                        {selectValue.length > 0 && <Button colorScheme='blue' mr={3} type="submit" onClick={handleConfigure}> Configure </Button> }
                     </CardBody>
                 </Card>
+
+
+                <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} motionPreset='slideInBottom' isCentered={true}>                    
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                Repository Successfully Configured!
+                            </AlertDialogHeader>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
             </Container>
         </div>
     );
