@@ -56,6 +56,7 @@ export default function AddRepo() {
     const [singleChecked, setSingleChecked] = useState<boolean>(false);
     const [singleCheckedData, setSingleCheckedData] = useState<RepoTable>({"id": "", "name": "", "link": "", "org": ""});
     const [selectComputeService, setSelectComputeService] = useState<string>("");
+    const [configureError, setConfigureError] = useState<boolean>(true);
 
     const [allRepositories, setAllRepositories] = useState<Array<RepoTable>>([]);
     const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
@@ -94,6 +95,7 @@ export default function AddRepo() {
 
 
     ///////////////////////////////////////////////////////////////////////
+    // Components
     const TableEntries = ({ name, link, id, org }: RepoTable) => {
         if (singleChecked==true && singleCheckedData.name == name){
             return (
@@ -175,6 +177,35 @@ export default function AddRepo() {
         )
     }
 
+    const PopupMessage = () => {
+        if (configureError == true){
+            return(
+                <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} motionPreset='slideInBottom' isCentered={true}>                    
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                One or many fields are empty. Please select repository and compute service again!
+                            </AlertDialogHeader>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
+            );
+        }
+        else{
+            return(
+                <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} motionPreset='slideInBottom' isCentered={true}>                    
+                    <AlertDialogOverlay>
+                        <AlertDialogContent>
+                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                                Repository Successfully Configured!
+                            </AlertDialogHeader>
+                        </AlertDialogContent>
+                    </AlertDialogOverlay>
+                </AlertDialog>
+            );
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////
     //Helpers
     const handleCheckBox = (id:string, name:string, link:string, org:string) => {
@@ -244,15 +275,16 @@ export default function AddRepo() {
         }
     }
 
-
     const handleConfigure = async () => {
         console.log("configure");
-
                 
         if (singleCheckedData.name=="" || singleCheckedData.link=="" || singleCheckedData.org=="" || selectComputeService==""){
-            console.log("One or many fields are empty");
+            //console.log("One or many fields are empty");
+            setConfigureError(true);
+            onOpen();
         }
         else{
+            setConfigureError(false);
             const requestOptions = {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
@@ -274,7 +306,6 @@ export default function AddRepo() {
     const admin_id = 1;
     ///////////////////////////////////////////////////////////////////////
 
-    
     return(
         <div> 
             <Container>
@@ -299,17 +330,7 @@ export default function AddRepo() {
                         {selectValue.length > 0 && <Button colorScheme='blue' mr={3} type="submit" onClick={handleConfigure}> Configure </Button> }
                     </CardBody>
                 </Card>
-
-
-                <AlertDialog isOpen={isOpen} leastDestructiveRef={cancelRef} onClose={onClose} motionPreset='slideInBottom' isCentered={true}>                    
-                    <AlertDialogOverlay>
-                        <AlertDialogContent>
-                            <AlertDialogHeader fontSize='lg' fontWeight='bold'>
-                                Repository Successfully Configured!
-                            </AlertDialogHeader>
-                        </AlertDialogContent>
-                    </AlertDialogOverlay>
-                </AlertDialog>
+                <PopupMessage/>
             </Container>
         </div>
     );
