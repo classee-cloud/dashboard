@@ -57,8 +57,6 @@ export default function AddRepo() {
     const [singleCheckedData, setSingleCheckedData] = useState<RepoTable>({"id": "", "name": "", "link": "", "org": ""});
     const [selectComputeService, setSelectComputeService] = useState<string>("");
 
-    const [octo, setOcto] = useState<Octokit>(dashboardController.octokit);
-
     const [allRepositories, setAllRepositories] = useState<Array<RepoTable>>([]);
     const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
     const [ComputeServices, setComputeServices] = useState<Array<ComputeService>>([]);
@@ -74,7 +72,6 @@ export default function AddRepo() {
 
     useEffect(() => {
         const octokit = dashboardController.octokit;
-        setOcto(octokit);
 
         var js:Array<Orgs> = [];
         octokit.request('GET /user')
