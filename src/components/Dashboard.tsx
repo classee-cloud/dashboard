@@ -48,7 +48,7 @@ export default function Dashboard() {
             const response = await fetch(`http://localhost:5001/api/config_repos/${data.login}`);
             const json = await response.json();
             await json.map((e:any) => {
-              setGitData(GitData => [{id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service}])
+              setGitData(GitData => [...GitData, {id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service}])
               });     
       })
       

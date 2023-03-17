@@ -82,7 +82,6 @@ export default class DashboardController extends (EventEmitter as new () => Type
     }
 
     public async refreshComputeServices(){
-        //TODO
         this.computeServices = await this._getComputeServices();
     }
 }
