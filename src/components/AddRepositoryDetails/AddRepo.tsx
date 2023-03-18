@@ -21,10 +21,6 @@ import { Container, Select, Card,  CardBody,
 } from '@chakra-ui/react'
 import ComputeServiceForm from "./ComputeServiceForm";
 import {useComputeServices, useDashboardController, useRepositoryDetails, RepoTable } from "../../classes/DashboardController";
-import { Octokit } from "octokit";
-
-import useFetchGet from "../../utils/useFetchGet";
-import useOctokitFetch from "../../utils/useOctokitFetch";
 
 
 interface Orgs {
