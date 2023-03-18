@@ -15,17 +15,25 @@ export type ConnectionProperties = {
 }
 
 
-
 export interface ComputeService {
     id: string;
     name: string;
 }
 
+export interface RepoTable {
+    id: string;
+    org: string;
+    name: string;
+    link: string;
+}
+
 export type DashboardEvent = {
     computeServices: (newComputeServices: ComputeService[]) => void;
+    repositories: (newRepositories: RepoTable[]) => void;
 }
 const REACT_APP_SERVICE_DB=process.env.REACT_APP_SERVICE_DB || "http://localhost:5001"
-const REACT_APP_SERVICE_GITHUB="http://localhost:8181"
+const REACT_APP_SERVICE_GITHUB=process.env.REACT_APP_SERVICE_GITHUB || "http://localhost:8181"
+
 export default class DashboardController extends (EventEmitter as new () => TypedEventEmitter<DashboardEvent>) {
     private _serviceDBURL: string;
     private _serviceGitHubURL: string;
@@ -33,13 +41,11 @@ export default class DashboardController extends (EventEmitter as new () => Type
     private _octokit: Octokit;
 
     private _computeServices: ComputeService[] = [];
+    private _allRepositories: RepoTable[] = [];   
 
+    // ------------------------------------------------------------------------------
     public constructor({ userProfile }: ConnectionProperties) {
         super();
-        // temp
-
-        // 
-        
         this._serviceDBURL = REACT_APP_SERVICE_DB || '';
         this._serviceGitHubURL = REACT_APP_SERVICE_GITHUB || '';
         if (this._serviceDBURL === '' || this._serviceGitHubURL === '') {
@@ -56,19 +62,9 @@ export default class DashboardController extends (EventEmitter as new () => Type
     public get octokit(): Octokit {
         return this._octokit;
     }
-
-    public get computeServices(){
-        return this._computeServices;
-    }
-
-    public set computeServices(computeServices: ComputeService[]){
-        this.emit("computeServices", computeServices);
-        this._computeServices = computeServices;
-    }
-
-    private async _getComputeServices() : Promise<ComputeService[]>{
-        const url = `${REACT_APP_SERVICE_DB}/api/computer-service/rajatkeshri/`;
-
+    // ----------------------------------------
+    private async _getComputeServices(name:string) : Promise<ComputeService[]>{
+        const url = `${REACT_APP_SERVICE_DB}/api/computer-service/${name}`;
         const requestOptions = {
             method: "GET",
         };
@@ -81,9 +77,61 @@ export default class DashboardController extends (EventEmitter as new () => Type
         return js;
     }
 
-    public async refreshComputeServices(){
-        this.computeServices = await this._getComputeServices();
+    public get computeServices(){
+        return this._computeServices;
     }
+
+    public set computeServices(computeServices: ComputeService[]){
+        this.emit("computeServices", computeServices);
+        this._computeServices = computeServices;
+    }
+
+    public async refreshComputeServices(name:string){
+        this.computeServices = await this._getComputeServices(name);
+    }
+
+    // ----------------------------------------
+    private async _getRepositories(name:string) : Promise<RepoTable[]>{
+        const url = `${REACT_APP_SERVICE_GITHUB}/repodetails/${name}`;
+        const requestOptions = {
+            method: "GET",
+        };
+        const response = await fetch(url, requestOptions);
+        const json = await response.json();
+        return json;
+    }
+
+    public get repositories(){
+        return this._allRepositories;
+    }
+
+    public set repositories(repo:RepoTable[]){
+        this.emit("repositories", repo);
+        this._allRepositories = repo;
+    }
+
+    public async refreshRepositories(name:string){
+        this.repositories = await this._getRepositories(name);
+    }
+
+    // ----------------------------------------
+    public async configureComputeService(singleCheckedData:RepoTable, selectComputeService:string){
+        const url = `${REACT_APP_SERVICE_DB}/api/config_repos`;
+
+        const requestOptions = {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                repo_name: singleCheckedData.name,
+                repo_link: singleCheckedData.link,
+                login_name: singleCheckedData.org,
+                service_name: selectComputeService
+            })
+        };
+        const responseCompute = await fetch(url, requestOptions);
+        console.log(responseCompute);
+    }
+
 }
 
 const context = React.createContext<DashboardController | null>(null);
@@ -95,18 +143,30 @@ export function useDashboardController(): DashboardController {
     return ctx;
 }
 
-export function useComputeServices(url:string) {
+export function useComputeServices() {
     const controller = useDashboardController();
     const [computeServices, setComputeServices] = useState<ComputeService[]>(controller.computeServices);
 
     useEffect(() =>{
         controller.addListener("computeServices", setComputeServices);
-        controller.refreshComputeServices();
-        //fetchComputeService();
         return () =>{
             controller.removeListener("computeServices", setComputeServices);
         }
     }, [controller]);
 
     return computeServices;
+}
+
+export function useRepositoryDetails() {
+    const controller = useDashboardController();
+    const [allRepositories, setAllRepositories] = useState<Array<RepoTable>>([]);
+
+    useEffect(() =>{
+        controller.addListener("repositories", setAllRepositories);
+        return () =>{
+            controller.removeListener("repositories", setAllRepositories);
+        }
+    }, [controller]);
+
+    return allRepositories;
 }

@@ -14,32 +14,18 @@ import { Container, Select, Card,  CardBody,
     FormControl,
     FormLabel,
     AlertDialog,
-    AlertDialogBody,
-    AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogOverlay,
     useDisclosure
 } from '@chakra-ui/react'
 import ComputeServiceForm from "./ComputeServiceForm";
-import { ComputeService, useComputeServices, useDashboardController } from "../../classes/DashboardController";
+import {useComputeServices, useDashboardController, useRepositoryDetails, RepoTable } from "../../classes/DashboardController";
 import { Octokit } from "octokit";
 
 import useFetchGet from "../../utils/useFetchGet";
 import useOctokitFetch from "../../utils/useOctokitFetch";
 
-
-interface SelectOptionEntry {
-    id: string;
-    name: string;
-}
-
-interface RepoTable {
-    id: string;
-    org: string;
-    name: string;
-    link: string;
-}
 
 interface Orgs {
     id: string;
@@ -52,23 +38,19 @@ interface Orgs {
 export default function AddRepo() {
     // UseState
     const dashboardController = useDashboardController();
+    const ComputeServices = useComputeServices();
+    const allRepositories = useRepositoryDetails();
+
     const [selectValue, setSelectValue] = useState<string>("");
     const [singleChecked, setSingleChecked] = useState<boolean>(false);
     const [singleCheckedData, setSingleCheckedData] = useState<RepoTable>({"id": "", "name": "", "link": "", "org": ""});
     const [selectComputeService, setSelectComputeService] = useState<string>("");
     const [configureError, setConfigureError] = useState<boolean>(true);
-
-    const [allRepositories, setAllRepositories] = useState<Array<RepoTable>>([]);
     const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
-    const [ComputeServices, setComputeServices] = useState<Array<ComputeService>>([]);
+    
 
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLDivElement>(null);
-    const closeRef = useRef<HTMLButtonElement>(null);
-
-    
-    //const ComputeServices, fetchComputeService = useComputeServices("");
-    const {data, isPending, error, refetch} = useFetchGet("");
 
 
     useEffect(() => {
@@ -232,36 +214,29 @@ export default function AddRepo() {
     const handleSelect = async (e:any) => {
         if (e.target.value== ""){
             setSelectValue("");
-            setAllRepositories([]);    
-            //setComputeServices([]);
-            //dashboardController.refreshComputeServices();
+            //setAllRepositories([]);     
+            dashboardController.refreshRepositories("");
         }
         else{
             const name =  Organizations.filter(v => v.id == e.target.value)[0].name;
             setSelectValue(name);
             
-            //await refetch(`http://localhost:8181/repodetails/${name}`);
-            //if (data.length){
-            //    await setAllRepositories(data);
-            //} 
-            
+            dashboardController.refreshRepositories(name);
+            dashboardController.refreshComputeServices(name);
+
+            /*
             const response = await fetch(`http://localhost:8181/repodetails/${name}`);
             const json = await response.json();
             setAllRepositories(json);
-
-            const requestOptions = {
-                method: "GET",
-            };
-            const responseCompute = await fetch(`http://localhost:5001/api/computer-service/${name}/`, requestOptions);
+            
+            const responseCompute = await fetch(`http://localhost:5001/api/computer-service/${name}/`);
             const jsonCompute = await responseCompute.json();
             var js:Array<ComputeService> = []
             jsonCompute.map((e:any) => {
                 js.push({id:e.id, name:e.service_name});
             })
-            
             setComputeServices(js);
-            //fetchComputeService();
-
+            */
         }
     }
 
@@ -285,18 +260,7 @@ export default function AddRepo() {
         }
         else{
             setConfigureError(false);
-            const requestOptions = {
-                method: "POST",
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    repo_name: singleCheckedData.name,
-                    repo_link: singleCheckedData.link,
-                    login_name: singleCheckedData.org,
-                    service_name: selectComputeService
-                })
-            };
-            const responseCompute = await fetch(`http://localhost:5001/api/config_repos`, requestOptions);
-            console.log(responseCompute);
+            dashboardController.configureComputeService(singleCheckedData, selectComputeService);
             setSelectComputeService("");
             setSingleChecked(false);
             onOpen();
