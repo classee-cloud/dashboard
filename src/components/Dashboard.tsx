@@ -14,26 +14,19 @@ import {
   Link, 
 } from "@chakra-ui/react";
 import { Octokit } from "octokit";
-import { useDashboardController } from "../classes/DashboardController";
+import { useDashboardController, useConfiguredRepositoryDetails ,TableItems } from "../classes/DashboardController";
 import {useNavigate} from 'react-router-dom';
 import { table } from "console";
-
-interface TableItems {
-  id: string;
-  name: string;
-  link: string;
-  login: string;
-  service:string;
-}
-
 
 
 export default function Dashboard() {
   const dashboardController = useDashboardController();
   const navigate = useNavigate();
-  const [GitData, setGitData] = useState<Array<TableItems>>([]);
+  //const [GitData, setGitData] = useState<Array<TableItems>>([]);
+  const GitData = useConfiguredRepositoryDetails();
 
   useEffect(() => {
+    console.log(dashboardController);
     const octokit = dashboardController.octokit;
     //octokit.request('GET /user/repos', {sort: 'pushed', direction: 'desc'})
     //.then(({ data }) => {
@@ -42,37 +35,47 @@ export default function Dashboard() {
     //    ));
     //});
 
+
+
     if (GitData.length==0){
       octokit.request('GET /user')
           .then( async ({data})=>{
+            dashboardController.refreshConfiguredRepositories(data.login);
+            /*
             const response = await fetch(`http://localhost:5001/api/config_repos/${data.login}`);
             const json = await response.json();
             await json.map((e:any) => {
-              setGitData(GitData => [...GitData, {id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service}])
+                setGitData(GitData => [...GitData, {id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service, status:e.status}])
               });     
+            */
       })
       
       // user/orgs
       octokit.request('GET /user/orgs')
           .then(({ data }) => {
-              //console.log(data);
               data.map(async (e) => {
+                dashboardController.refreshConfiguredRepositories(e.login);
+                /*
                 const response = await fetch(`http://localhost:5001/api/config_repos/${e.login}`);
                 const json = await response.json();
                 await json.map((e:any) => {
-                  setGitData(GitData => [ ...GitData, {id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service}])
+                  setGitData(GitData => [ ...GitData, {id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service, status:e.status}])
                 });
+                */
               })
       });      
     }
-
+    
   }, [dashboardController]);
 
 
   
-  const TableEntries = ({ name, link, id, login, service}: TableItems) => {
+  const TableEntries = ({ name, link, id, login, service, status}: TableItems) => {
     return (
       <Tr>
+        <Td>
+          {status} 
+        </Td>
         <Td>
           {name}
         </Td>
@@ -112,9 +115,8 @@ export default function Dashboard() {
           <Table variant="simple">
             <Thead>
               <Tr>
-                <Th>
-                  Repository Name
-                </Th>
+                <Th>Status</Th>
+                <Th>Repository Name</Th>
                 <Th>Link</Th>
                 <Th>Organization Name</Th>
                 <Th>Compute Service</Th>
@@ -130,6 +132,7 @@ export default function Dashboard() {
                   service={e.service}
                   id={e.id}
                   key={e.id}
+                  status={e.status}
                 />
               ))}
             </Tbody>

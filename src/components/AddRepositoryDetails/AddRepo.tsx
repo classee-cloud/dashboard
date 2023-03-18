@@ -20,15 +20,7 @@ import { Container, Select, Card,  CardBody,
     useDisclosure
 } from '@chakra-ui/react'
 import ComputeServiceForm from "./ComputeServiceForm";
-import {useComputeServices, useDashboardController, useRepositoryDetails, RepoTable } from "../../classes/DashboardController";
-
-
-interface Orgs {
-    id: string;
-    name: string;
-    url: string;
-}
-
+import {useComputeServices, useDashboardController, useRepositoryDetails, RepoTable, Orgs } from "../../classes/DashboardController";
 
   
 export default function AddRepo() {

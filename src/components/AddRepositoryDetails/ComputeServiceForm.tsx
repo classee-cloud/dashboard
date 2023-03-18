@@ -9,18 +9,17 @@ import { Container,
     ModalOverlay,
     ModalContent,
     ModalHeader,
-    ModalFooter,
     ModalBody,
     ModalCloseButton, 
     useDisclosure,
-    FormHelperText,
-    FormErrorMessage,
     Text
 } from '@chakra-ui/react'
-import useFetchGet from "../../utils/useFetchGet";
+import {useDashboardController, ComputeServiceDetails} from "../../classes/DashboardController";
 
 
 export default function ComputeServiceForm({admin_id, login_name}:any) {
+    const dashboardController = useDashboardController();
+
     const { isOpen, onOpen, onClose } = useDisclosure()
     const [errorValue, setError] = useState<boolean>(true);
     const [serviceName, setServiceName] = useState<string>("");
@@ -49,11 +48,10 @@ export default function ComputeServiceForm({admin_id, login_name}:any) {
       };
 
     const handleSubmit = async () => {
-        console.log(serviceName, email, password, admin_id, login_name);
         // check if email is valid
         if (validateEmail(email) && password != ""){
-            // post to database
             setError(false);
+            /*
             const requestOptions = {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
@@ -67,7 +65,18 @@ export default function ComputeServiceForm({admin_id, login_name}:any) {
             };
             const responseCompute = await fetch(`http://localhost:5001/api/computer-service`, requestOptions);
             console.log(responseCompute);
+            */
             
+            // post to database
+            var data:ComputeServiceDetails = {
+                service_name: serviceName,
+                email: email,
+                password: password,
+                admin_id: admin_id,
+                login_name: login_name
+            }
+            dashboardController.addNewComputeService(data);
+            onClose();
         }
         else{
             setError(true);
