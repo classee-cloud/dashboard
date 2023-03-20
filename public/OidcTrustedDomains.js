@@ -13,5 +13,6 @@ const trustedDomains = {
     'https://auth.in.ripley.cloud/if/session-end/classee-cloud/',
     'https://auth.in.ripley.cloud/application/o/introspect/',
     'https://auth.in.ripley.cloud/application/o/device/',
+    'http://localhost:5001', 'http://localhost:8181', 'http://localhost:8282'
      ]
 };
