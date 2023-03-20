@@ -20,6 +20,7 @@ const LoggedIn = () => {
   useEffect(() => {
     if (oidcUser.oidcUserLoadingState === "User loaded") {
       setDashboardController( (oldDashboardController) =>{
+        //console.log("----------", oldDashboardController);
         if(oldDashboardController){
           return oldDashboardController;
         }

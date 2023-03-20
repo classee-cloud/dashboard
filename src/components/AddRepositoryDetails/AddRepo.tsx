@@ -201,8 +201,7 @@ export default function AddRepo() {
 
     const handleSelect = async (e:any) => {
         if (e.target.value== ""){
-            setSelectValue("");
-            //setAllRepositories([]);     
+            setSelectValue(""); 
             dashboardController.refreshRepositories("");
         }
         else{
@@ -211,20 +210,6 @@ export default function AddRepo() {
             
             dashboardController.refreshRepositories(name);
             dashboardController.refreshComputeServices(name);
-
-            /*
-            const response = await fetch(`http://localhost:8181/repodetails/${name}`);
-            const json = await response.json();
-            setAllRepositories(json);
-            
-            const responseCompute = await fetch(`http://localhost:5001/api/computer-service/${name}/`);
-            const jsonCompute = await responseCompute.json();
-            var js:Array<ComputeService> = []
-            jsonCompute.map((e:any) => {
-                js.push({id:e.id, name:e.service_name});
-            })
-            setComputeServices(js);
-            */
         }
     }
 

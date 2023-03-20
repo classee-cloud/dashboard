@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import React, { useState, useEffect, ChangeEvent } from "react";
+import React, { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import {
   TableContainer,
@@ -16,38 +16,21 @@ import {
 import { Octokit } from "octokit";
 import { useDashboardController, useConfiguredRepositoryDetails ,TableItems } from "../classes/DashboardController";
 import {useNavigate} from 'react-router-dom';
-import { table } from "console";
 
 
 export default function Dashboard() {
   const dashboardController = useDashboardController();
   const navigate = useNavigate();
-  //const [GitData, setGitData] = useState<Array<TableItems>>([]);
   const GitData = useConfiguredRepositoryDetails();
 
   useEffect(() => {
     console.log(dashboardController);
     const octokit = dashboardController.octokit;
-    //octokit.request('GET /user/repos', {sort: 'pushed', direction: 'desc'})
-    //.then(({ data }) => {
-    // setGitData(data.map(
-    //    eachRepo => ({id: eachRepo.id.toString(), name: eachRepo.name, link: eachRepo.html_url, service:eachRepo.service})
-    //    ));
-    //});
-
-
 
     if (GitData.length==0){
       octokit.request('GET /user')
           .then( async ({data})=>{
             dashboardController.refreshConfiguredRepositories(data.login);
-            /*
-            const response = await fetch(`http://localhost:5001/api/config_repos/${data.login}`);
-            const json = await response.json();
-            await json.map((e:any) => {
-                setGitData(GitData => [...GitData, {id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service, status:e.status}])
-              });     
-            */
       })
       
       // user/orgs
@@ -55,13 +38,6 @@ export default function Dashboard() {
           .then(({ data }) => {
               data.map(async (e) => {
                 dashboardController.refreshConfiguredRepositories(e.login);
-                /*
-                const response = await fetch(`http://localhost:5001/api/config_repos/${e.login}`);
-                const json = await response.json();
-                await json.map((e:any) => {
-                  setGitData(GitData => [ ...GitData, {id:e.id, name:e.repo_name, link:e.repo_link, login:e.login, service:e.service, status:e.status}])
-                });
-                */
               })
       });      
     }
