@@ -165,10 +165,11 @@ export default class DashboardController extends (EventEmitter as new () => Type
     }
 
     public set configuredRepositories(repo:TableItems[]){
-        for (let i=0;i<repo.length;i++ ){
+        /*for (let i=0;i<repo.length;i++ ){
             this._configuredRepositories.push({id:repo[i].id, name:repo[i].name, link:repo[i].link, login:repo[i].login, service:repo[i].service, status:repo[i].status})    
         }
-        //this._configuredRepositories.concat(repo);
+        */
+        this._configuredRepositories = this._configuredRepositories.concat(repo);
         this.emit("configuredRepositories", this._configuredRepositories);
         console.log(this._configuredRepositories);
         
