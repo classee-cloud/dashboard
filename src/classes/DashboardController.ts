@@ -57,8 +57,8 @@ export type DashboardEvent = {
     repositories: (newRepositories: RepoTable[]) => void;
     configuredRepositories: (confifuredRepositories: TableItems[]) => void;
 }
-const REACT_APP_SERVICE_DB=process.env.REACT_APP_SERVICE_DB || "http://localhost:5001"
-const REACT_APP_SERVICE_GITHUB=process.env.REACT_APP_SERVICE_GITHUB || "http://localhost:8181"
+const REACT_APP_SERVICE_DB=process.env.REACT_APP_SERVICE_DB || "https://db-dev.classee.cloud"
+const REACT_APP_SERVICE_GITHUB=process.env.REACT_APP_SERVICE_GITHUB || "https://gh-dev.classee.cloud"
 
 //------------------------------------------------------------------------------------------------------------
 export default class DashboardController extends (EventEmitter as new () => TypedEventEmitter<DashboardEvent>) {
@@ -165,19 +165,18 @@ export default class DashboardController extends (EventEmitter as new () => Type
     }
 
     public set configuredRepositories(repo:TableItems[]){
-        /*for (let i=0;i<repo.length;i++ ){
-            this._configuredRepositories.push({id:repo[i].id, name:repo[i].name, link:repo[i].link, login:repo[i].login, service:repo[i].service, status:repo[i].status})    
-        }
-        */
-        this._configuredRepositories = this._configuredRepositories.concat(repo);
+        this._configuredRepositories = repo;
         this.emit("configuredRepositories", this._configuredRepositories);
         console.log(this._configuredRepositories);
         
     }
 
-    public async refreshConfiguredRepositories(name:string){
-        this.configuredRepositories = await this._getConfiguredRepositories(name);
-    }
+    public async refreshConfiguredRepositories(){
+        let orgs = [this._userProfile.github.username];
+        orgs = orgs.concat((await this._octokit.request('GET /user/orgs')).data.map(eachOrg => eachOrg.login));
+        const configuredRepositories = orgs.map(eachOrgName => this._getConfiguredRepositories(eachOrgName));
+        this.configuredRepositories = (await Promise.all(configuredRepositories)).flat();
+     }
 
     // ----------------------------------------
     public async addNewComputeService(computeData:ComputeServiceDetails){
@@ -191,7 +190,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
                 email: computeData.email,
                 password: computeData.password,
                 admin_id: computeData.admin_id,
-                login_name: computeData.login_name
+                login_name: computeData.login_name,
             })
         };
         const response = await fetch(url, requestOptions);
@@ -208,7 +207,8 @@ export default class DashboardController extends (EventEmitter as new () => Type
                 repo_name: singleCheckedData.name,
                 repo_link: singleCheckedData.link,
                 login_name: singleCheckedData.org,
-                service_name: selectComputeService
+                service_name: selectComputeService,
+                status: "not started"
             })
         };
         const responseCompute = await fetch(url, requestOptions);
