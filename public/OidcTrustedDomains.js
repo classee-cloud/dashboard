@@ -14,31 +14,8 @@ const trustedDomains = {
     'https://auth.in.ripley.cloud/application/o/introspect/',
     'https://auth.in.ripley.cloud/application/o/device/',
 
-    'http://localhost:5001/',
-    'http://localhost:5001/api/computer-service/:name',
-    'http://localhost:5001/api/computer-service',
-    'http://localhost:5001/api/computer-service/:aid/:service',
-    'http://localhost:5001/api/config_repos/:name',
-    'http://localhost:5001/api/config_repos',
-    'http://localhost:5001/api/config_repos/:repo_name',
-    'http://localhost:5001/api/config_repos/:reponame',
-    'http://localhost:5001/api/user/:uid/org/:orgid',
-    'http://localhost:5001/api/user/:uid/repo/:repoid',
-    'http://localhost:5001/api/organisation',
-    'http://localhost:5001/api/repo',
-    'http://localhost:5001/api/repo/:name',
-    'http://localhost:5001/api/repo',
-    'http://localhost:5001/api/login',
-    'http://localhost:5001/api/refresh-token',
-    'http://localhost:5001/api/user',
-    'http://localhost:5001/api/user/:uid',
-    'http://localhost:5001/api/user/:uid/repo',
-    'http://localhost:5001/api/user/:uid',
-
-    'http://localhost:8181/repodetails/:loginName', 
-    'http://localhost:8181/runnertoken/:org/:reponame', 
-    
-    'http://localhost:8282/',
-    'http://localhost:8282/runner'
+    'https://db-dev.classee.cloud/',
+    'https://gh-dev.classee.cloud/', 
+    'https://compute-dev.classee.cloud/',
      ]
 };
