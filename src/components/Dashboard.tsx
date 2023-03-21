@@ -24,9 +24,12 @@ export default function Dashboard() {
   const GitData = useConfiguredRepositoryDetails();
 
   useEffect(() => {
+    const refreshConfiguredRepositories = () => 
     console.log(dashboardController);
     const octokit = dashboardController.octokit;
-
+    dashboardController.refreshConfiguredRepositories();
+    
+    /*
     if (GitData.length==0){
       octokit.request('GET /user')
           .then( async ({data})=>{
@@ -41,6 +44,7 @@ export default function Dashboard() {
               })
       });      
     }
+    */
     
   }, [dashboardController]);
 
