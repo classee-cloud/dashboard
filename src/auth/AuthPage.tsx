@@ -1,35 +1,32 @@
-import React, { useEffect } from "react";
 import { OidcProvider, OidcSecure, useOidcUser } from "@axa-fr/react-oidc";
-import { useOidc } from "@axa-fr/react-oidc";
+import React, { useEffect } from "react";
 
-import HomePage from "../components/HomePage";
 import { ChakraProvider } from "@chakra-ui/react";
 import { BrowserRouter } from "react-router-dom";
-import LoginPage from "../components/LoginPage";
-import { Configuration } from "./Configuration";
 import DashboardController, {
   ClasseCloudDecodedToken,
-  DashboardControllerContext,
+  DashboardControllerContext
 } from "../classes/DashboardController";
-import { isatty } from "tty";
+import HomePage from "../components/HomePage";
+import { Configuration } from "./Configuration";
 
 const LoggedIn = () => {
   const oidcUser = useOidcUser();
   const [dashboardController, setDashboardController] =
     React.useState<DashboardController>();
   useEffect(() => {
-    if (oidcUser.oidcUserLoadingState === "User loaded") {
-      setDashboardController( (oldDashboardController) =>{
-        if(oldDashboardController){
-          return oldDashboardController;
-        }
-        return new DashboardController({ userProfile: oidcUser.oidcUser as unknown as ClasseCloudDecodedToken});
+    if (!dashboardController) {
+      if (oidcUser.oidcUserLoadingState === "User loaded") {
+        setDashboardController(
+          new DashboardController({
+            userProfile:
+              oidcUser.oidcUser as unknown as ClasseCloudDecodedToken,
+          }));
+      } else {
+        setDashboardController(undefined);
       }
-      );
-    } else {
-      setDashboardController(undefined);
     }
-  }, [oidcUser]);
+  }, [oidcUser, dashboardController]);
   if (!dashboardController) {
     return <div>Loading...</div>;
   }
