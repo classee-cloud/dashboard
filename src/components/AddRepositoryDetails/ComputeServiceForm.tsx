@@ -17,7 +17,7 @@ import { Container,
 import {useDashboardController, ComputeServiceDetails} from "../../classes/DashboardController";
 
 
-export default function ComputeServiceForm({admin_id, login_name}:any) {
+export default function ComputeServiceForm({login_name}:any) {
     const dashboardController = useDashboardController();
 
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -55,8 +55,7 @@ export default function ComputeServiceForm({admin_id, login_name}:any) {
                 service_name: serviceName,
                 email: email,
                 password: password,
-                admin_id: admin_id,
-                login_name: login_name
+                login_name: login_name,
             }
             dashboardController.addNewComputeService(data);
             onClose();

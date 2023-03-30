@@ -41,7 +41,6 @@ export interface ComputeServiceDetails{
     service_name: string;
     email: string;
     password: string;
-    admin_id: string;
     login_name: string;
 }
 
@@ -91,6 +90,40 @@ export default class DashboardController extends (EventEmitter as new () => Type
         return this._octokit;
     }
 
+    public async getRepos(loginName:string){
+        var repos = [];
+
+        const allRepos:any = [];
+        const allOrgs:any = [] ;
+
+        if (loginName == "rajatkeshri")
+        {
+            await this._octokit.request('GET /user/repos')
+            .then(({data})=>{
+                allRepos.push(data);
+            })
+        }
+        else{
+            await this._octokit.request('GET /user/orgs')
+                .then(({ data }) => {
+                    data.map((e) => {       
+                        allOrgs.push({name:e.login});
+                    })
+                
+                console.log(allOrgs, allOrgs[0]);
+                for(let i=0; i<allOrgs.length; i++){
+                    this._octokit.request('GET /orgs/{org}/repos', ({
+                        org:allOrgs[i].name
+                    }))
+                    .then((x) => {
+                        allRepos.push(x.data);
+                    })
+                }
+            }); 
+        }        
+        return allRepos;
+    }
+
     // ----------------------------------------
     private async _getComputeServices(name:string) : Promise<ComputeService[]>{
         const url = `${REACT_APP_SERVICE_DB}/api/computer-service/${name}`;
@@ -127,6 +160,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
         };
         const response = await fetch(url, requestOptions);
         const json = await response.json();
+        console.log(this.getRepos(name));
         return json;
     }
 
@@ -181,7 +215,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
     // ----------------------------------------
     public async addNewComputeService(computeData:ComputeServiceDetails){
         const url = `${REACT_APP_SERVICE_DB}/api/computer-service`;
-        console.log("-------", computeData.service_name, computeData.email, computeData.password, computeData.admin_id, computeData.login_name);
+        console.log("-------", computeData.service_name, computeData.email, computeData.password, computeData.login_name);
         const requestOptions = {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -189,7 +223,6 @@ export default class DashboardController extends (EventEmitter as new () => Type
                 service_name: computeData.service_name,
                 email: computeData.email,
                 password: computeData.password,
-                admin_id: computeData.admin_id,
                 login_name: computeData.login_name,
             })
         };
