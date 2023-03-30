@@ -90,40 +90,6 @@ export default class DashboardController extends (EventEmitter as new () => Type
         return this._octokit;
     }
 
-    public async getRepos(loginName:string){
-        var repos = [];
-
-        const allRepos:any = [];
-        const allOrgs:any = [] ;
-
-        if (loginName == "rajatkeshri")
-        {
-            await this._octokit.request('GET /user/repos')
-            .then(({data})=>{
-                allRepos.push(data);
-            })
-        }
-        else{
-            await this._octokit.request('GET /user/orgs')
-                .then(({ data }) => {
-                    data.map((e) => {       
-                        allOrgs.push({name:e.login});
-                    })
-                
-                console.log(allOrgs, allOrgs[0]);
-                for(let i=0; i<allOrgs.length; i++){
-                    this._octokit.request('GET /orgs/{org}/repos', ({
-                        org:allOrgs[i].name
-                    }))
-                    .then((x) => {
-                        allRepos.push(x.data);
-                    })
-                }
-            }); 
-        }        
-        return allRepos;
-    }
-
     // ----------------------------------------
     private async _getComputeServices(name:string) : Promise<ComputeService[]>{
         const url = `${REACT_APP_SERVICE_DB}/api/computer-service/${name}`;
@@ -160,7 +126,6 @@ export default class DashboardController extends (EventEmitter as new () => Type
         };
         const response = await fetch(url, requestOptions);
         const json = await response.json();
-        console.log(this.getRepos(name));
         return json;
     }
 
