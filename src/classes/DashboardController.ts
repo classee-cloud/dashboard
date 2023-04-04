@@ -41,7 +41,6 @@ export interface ComputeServiceDetails{
     service_name: string;
     email: string;
     password: string;
-    admin_id: string;
     login_name: string;
 }
 
@@ -181,7 +180,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
     // ----------------------------------------
     public async addNewComputeService(computeData:ComputeServiceDetails){
         const url = `${REACT_APP_SERVICE_DB}/api/computer-service`;
-        console.log("-------", computeData.service_name, computeData.email, computeData.password, computeData.admin_id, computeData.login_name);
+        console.log("-------", computeData.service_name, computeData.email, computeData.password, computeData.login_name);
         const requestOptions = {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -189,7 +188,6 @@ export default class DashboardController extends (EventEmitter as new () => Type
                 service_name: computeData.service_name,
                 email: computeData.email,
                 password: computeData.password,
-                admin_id: computeData.admin_id,
                 login_name: computeData.login_name,
             })
         };
