@@ -53,7 +53,7 @@ export default function AddRepo() {
         // user/orgs
         octokit.request('GET /user/orgs')
             .then(({ data }) => {
-                console.log(data);
+                //console.log(data);
                 data.map((e) => {
                     js.push({id:e.id.toString(), name:e.login, url:e.url});
                 })
@@ -207,14 +207,13 @@ export default function AddRepo() {
         else{
             const name =  Organizations.filter(v => v.id == e.target.value)[0].name;
             setSelectValue(name);
-            
             dashboardController.refreshRepositories(name);
             dashboardController.refreshComputeServices(name);
         }
     }
 
     const handleComputeSelect = (e:any) => {
-        console.log(e.target);
+        //console.log(e.target);
         if (e.target.value== ""){
             setSelectComputeService("");
         }
@@ -260,7 +259,7 @@ export default function AddRepo() {
                     </CardBody>
                     <Divider />
                     <CardBody>
-                        {selectValue.length > 0 && <ComputeServiceForm admin_id={admin_id} login_name={selectValue} /> }
+                        {selectValue.length > 0 && <ComputeServiceForm login_name={selectValue} /> }
                         {selectValue.length>0 && <SelectComputeEntries/>}
                     </CardBody>
                     <CardBody>
