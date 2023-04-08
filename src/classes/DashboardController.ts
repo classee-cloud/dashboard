@@ -166,7 +166,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
     public set configuredRepositories(repo:TableItems[]){
         this._configuredRepositories = repo;
         this.emit("configuredRepositories", this._configuredRepositories);
-        console.log(this._configuredRepositories);
+        //console.log(this._configuredRepositories);
         
     }
 
@@ -180,7 +180,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
     // ----------------------------------------
     public async addNewComputeService(computeData:ComputeServiceDetails){
         const url = `${REACT_APP_SERVICE_DB}/api/computer-service`;
-        console.log("-------", computeData.service_name, computeData.email, computeData.password, computeData.login_name);
+        //console.log("-------", computeData.service_name, computeData.email, computeData.password, computeData.login_name);
         const requestOptions = {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
@@ -192,7 +192,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
             })
         };
         const response = await fetch(url, requestOptions);
-        console.log(response);
+        //console.log(response);
     }
 
     public async configureComputeService(singleCheckedData:RepoTable, selectComputeService:string){
@@ -210,7 +210,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
             })
         };
         const responseCompute = await fetch(url, requestOptions);
-        console.log(responseCompute);
+        //console.log(responseCompute);
     }
 
 }
@@ -258,7 +258,7 @@ export function useConfiguredRepositoryDetails() {
 
     useEffect(() =>{
         controller.addListener("configuredRepositories", setConfoguredRepositories);
-        console.log(configuredRepositories);
+        //console.log(configuredRepositories);
         return () =>{
             controller.removeListener("configuredRepositories", setConfoguredRepositories);
         }

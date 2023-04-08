@@ -24,7 +24,7 @@ const App = () => {
 
     const handleSubmit = (e:React.SyntheticEvent) => {
         e.preventDefault();
-        console.log(email, password);
+        //console.log(email, password);
         setEmail("");
         setPassword("");
         login('/');
