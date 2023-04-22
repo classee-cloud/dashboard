@@ -95,7 +95,7 @@ export default function Dashboard() {
         <h2> Configured Github Repositories </h2>
         <br />
 
-        {GitData.length <=0 && <h1>No repositories Configured...</h1>}
+        {GitData.length <=0 && <h1>No repositories configured. Configure new reposistory..</h1>}
         {GitData.length >0 &&
         <TableContainer>
           <Table variant="simple">
