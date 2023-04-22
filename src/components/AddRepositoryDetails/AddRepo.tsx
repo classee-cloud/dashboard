@@ -17,7 +17,8 @@ import { Container, Select, Card,  CardBody,
     AlertDialogHeader,
     AlertDialogContent,
     AlertDialogOverlay,
-    useDisclosure
+    useDisclosure, 
+    TableContainer
 } from '@chakra-ui/react'
 import ComputeServiceForm from "./ComputeServiceForm";
 import {useComputeServices, useDashboardController, useRepositoryDetails, RepoTable, Orgs } from "../../classes/DashboardController";
@@ -36,10 +37,19 @@ export default function AddRepo() {
     const [configureError, setConfigureError] = useState<boolean>(true);
     const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
     
-
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLDivElement>(null);
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const recordsPerPage = 5;
+    const lastIndex = currentPage * recordsPerPage;
+    const firstIndex = lastIndex - recordsPerPage;
+    const records = allRepositories.slice(firstIndex, lastIndex);
+    const npage = Math.ceil(allRepositories.length / recordsPerPage);
+    var numbers:Array<number> = [];
+    for (var i=1; i<=npage; i++){
+        numbers.push(i);
+    }
 
     useEffect(() => {
         const octokit = dashboardController.octokit;
@@ -65,7 +75,7 @@ export default function AddRepo() {
 
 
     ///////////////////////////////////////////////////////////////////////
-    // Components
+    // Components 
     const TableEntries = ({ name, link, id, org }: RepoTable) => {
         if (singleChecked==true && singleCheckedData.name == name){
             return (
@@ -122,7 +132,7 @@ export default function AddRepo() {
                     </Thead>
                     
                     <Tbody>
-                    {allRepositories.map((e) => (
+                    {records.map((e) => (
                         <TableEntries
                         org={e.org}
                         name={e.name}
@@ -131,8 +141,30 @@ export default function AddRepo() {
                         id={e.id}
                         />
                     ))}
+
                     </Tbody>
                 </Table>
+
+                <ul className="pagination">
+                    {numbers.length>0 && 
+                        <li className="page-item">
+                        <Link className="page-link" onClick={prePage}> Prev </Link>
+                    </li>}
+                    
+                    {numbers.map((e:number, i:number) => (
+                        <li key={i} className={`page-item ${currentPage === e ? 'active' : ''}`}>
+                            <Link className="page-link" onClick={() => changePage(e)}> 
+                                {e}
+                            </Link>
+                        </li>
+                    ))}
+
+                    {numbers.length>0 && 
+                    <li>
+                        <Link className="page-link" onClick={nextPage}> Next </Link>
+                    </li>
+                    }   
+                </ul>
         </div>
     )
     }
@@ -240,12 +272,27 @@ export default function AddRepo() {
     }
 
     const admin_id = 1;
+    const prePage = () => {
+        if (currentPage !== firstIndex){
+            setCurrentPage(currentPage - 1)
+        }
+    }
+
+    const changePage = (id:number) => {
+    setCurrentPage(id)
+    }
+
+    const nextPage = () => {
+    if (currentPage !== lastIndex){
+        setCurrentPage(currentPage + 1)
+    }
+    }
     ///////////////////////////////////////////////////////////////////////
 
     return(
         <div> 
             <Container>
-                <Card maxW="md">
+                <Card maxW="sm">
                     <CardBody>
                         <FormControl>
                             <FormLabel>Organization</FormLabel>
@@ -270,4 +317,10 @@ export default function AddRepo() {
             </Container>
         </div>
     );
+
+    
   }
+
+
+
+  
