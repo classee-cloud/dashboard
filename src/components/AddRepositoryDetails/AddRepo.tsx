@@ -76,6 +76,7 @@ export default function AddRepo() {
         });      
         
         setSelectValue("");
+        console.log("filtered records" records);
       }, [dashboardController, submitClicked]);
 
 
