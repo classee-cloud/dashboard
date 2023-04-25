@@ -36,20 +36,25 @@ export default function AddRepo() {
     const [selectComputeService, setSelectComputeService] = useState<string>("");
     const [configureError, setConfigureError] = useState<boolean>(true);
     const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
-    
+    const [searchValue, setSearchValue] = useState("");
+    const [submitClicked, setSubmitClicked] = useState(Boolean);
+    var [records, setRecords] = useState<Array<RepoTable>>([]);
+
+    // Compute Form
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLDivElement>(null);
 
+    // pagination
     const [currentPage, setCurrentPage] = useState(1);
     const recordsPerPage = 5;
     const lastIndex = currentPage * recordsPerPage;
     const firstIndex = lastIndex - recordsPerPage;
-    const records = allRepositories.slice(firstIndex, lastIndex);
     const npage = Math.ceil(allRepositories.length / recordsPerPage);
     var numbers:Array<number> = [];
     for (var i=1; i<=npage; i++){
         numbers.push(i);
     }
+    records = allRepositories.slice(firstIndex, lastIndex);
 
     useEffect(() => {
         const octokit = dashboardController.octokit;
@@ -71,7 +76,7 @@ export default function AddRepo() {
         });      
         
         setSelectValue("");
-      }, [dashboardController]);
+      }, [dashboardController, submitClicked]);
 
 
     ///////////////////////////////////////////////////////////////////////
@@ -116,13 +121,9 @@ export default function AddRepo() {
         
       };
 
-    const TableData = () => {
-    return(
-        <div>
-            <FormLabel>
-                Repositories 
-                <Input id="search" float="right" height="9" width="50" type="text" onChange={handleSearch} />
-            </FormLabel>
+      const TableData = ({records}:any) => {
+        return(
+            <div>
                 <Table >
                     <Thead>
                         <Tr>
@@ -132,7 +133,7 @@ export default function AddRepo() {
                     </Thead>
                     
                     <Tbody>
-                    {records.map((e) => (
+                    {records.map((e:any) => (
                         <TableEntries
                         org={e.org}
                         name={e.name}
@@ -141,10 +142,10 @@ export default function AddRepo() {
                         id={e.id}
                         />
                     ))}
-
+    
                     </Tbody>
                 </Table>
-
+    
                 <ul className="pagination">
                     {numbers.length>0 && 
                         <li className="page-item">
@@ -158,16 +159,16 @@ export default function AddRepo() {
                             </Link>
                         </li>
                     ))}
-
+    
                     {numbers.length>0 && 
                     <li>
                         <Link className="page-link" onClick={nextPage}> Next </Link>
                     </li>
                     }   
                 </ul>
-        </div>
-    )
-    }
+            </div>
+        )
+    }    
 
     const SelectComputeEntries = () => {
         return (
@@ -228,8 +229,20 @@ export default function AddRepo() {
     }
 
     const handleSearch = (() => {
-        console.log("search");
+        setSearchValue(e.target.value)
     });
+
+    const handleSearchSubmit = () => {
+        var s = searchValue.toLowerCase();
+        var temp = [];
+        for (var index=0; index<allRepositories.length; index++){
+            if(allRepositories[index].name.includes(s)){
+                temp.push(allRepositories[index])
+            }
+        }
+        setRecords(temp);
+        setSubmitClicked(!submitClicked);
+    }
 
     const handleSelect = async (e:any) => {
         if (e.target.value== ""){
@@ -271,7 +284,7 @@ export default function AddRepo() {
         }   
     }
 
-    const admin_id = 1;
+    // handling pagination
     const prePage = () => {
         if (currentPage !== firstIndex){
             setCurrentPage(currentPage - 1)
@@ -279,7 +292,7 @@ export default function AddRepo() {
     }
 
     const changePage = (id:number) => {
-    setCurrentPage(id)
+        setCurrentPage(id)
     }
 
     const nextPage = () => {
@@ -301,7 +314,19 @@ export default function AddRepo() {
                             </Select>
                             <br/>
                             <br/>
-                            <TableData/>
+                            <FormLabel>
+                                Repositories 
+                                <Input id="search" 
+                                value={searchValue} 
+                                name="search" 
+                                float="right" 
+                                height="9" 
+                                width="50" 
+                                type="text" 
+                                onChange={handleSearch}/>
+                                <Button type="submit" onClick={handleSearchSubmit}> Search </Button>
+                            </FormLabel>
+                            <TableData records={records}/>
                         </FormControl>
                     </CardBody>
                     <Divider />
