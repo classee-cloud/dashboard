@@ -116,11 +116,9 @@ export default class DashboardController extends (EventEmitter as new () => Type
         const allOrgs:any = [] ;
 
         //console.log(loginName, this.getUserName())
-        if (loginName == this.getUserName())
+        if (loginName === this.getUserName())
         {
-            await this._octokit.request('GET /user/repos', ({
-                type: "all"
-            }))
+            await this._octokit.request('GET /user/repos')
             .then(({data}:any)=>{
                 data.map((value:any) => {
                     allRepos.push({"id":value.id, "name":value.name, "org": value.owner.login, "link":value.html_url});
@@ -185,17 +183,17 @@ export default class DashboardController extends (EventEmitter as new () => Type
     // API request to github service to fetch all the repo details under the given user
     private async _getRepositories(name:string) : Promise<RepoTable[]>{
         // This fetches repository details from github service.
-        /*
+        
         const url = `${REACT_APP_SERVICE_GITHUB}/repodetails/${name}`;
         const requestOptions = {
             method: "GET",
         };
         const response = await fetch(url, requestOptions);
         const json = await response.json();
-        */
+        
 
         // uses dashboard controller's octokit to get the repo details - safer way to do
-        const json = await this.getRepos(name);
+        //const json = await this.getRepos(name);
         return json;
     }
 
@@ -340,13 +338,13 @@ export function useRepositoryDetails() {
 // custom hook for configured repository details
 export function useConfiguredRepositoryDetails() {
     const controller = useDashboardController();
-    const [configuredRepositories, setConfoguredRepositories] = useState<Array<TableItems>>([]);
+    const [configuredRepositories, setConfiguredRepositories] = useState<Array<TableItems>>([]);
 
     useEffect(() =>{
-        controller.addListener("configuredRepositories", setConfoguredRepositories);
+        controller.addListener("configuredRepositories", setConfiguredRepositories);
         console.log(configuredRepositories);
         return () =>{
-            controller.removeListener("configuredRepositories", setConfoguredRepositories);
+            controller.removeListener("configuredRepositories", setConfiguredRepositories);
         }
     }, [controller]);
 
