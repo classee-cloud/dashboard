@@ -9,7 +9,7 @@ export type ClasseCloudDecodedToken = {
     email: string;
     github: { username: string, token: string };
     name: string;
-    nickname: string;
+    preferred_name: string;
 }
 
 // custom type for Connection Properties
@@ -102,7 +102,7 @@ export default class DashboardController extends (EventEmitter as new () => Type
 
     // return the login user name
     public getUserName():string{
-        return this._userProfile.nickname;
+        return this._userProfile.preferred_name;
     }
 
     // return the octokit instance
