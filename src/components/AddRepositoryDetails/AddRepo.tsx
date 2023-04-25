@@ -18,28 +18,35 @@ import { Container, Select, Card,  CardBody,
     AlertDialogContent,
     AlertDialogOverlay,
     useDisclosure, 
-    TableContainer
 } from '@chakra-ui/react'
 import ComputeServiceForm from "./ComputeServiceForm";
 import {useComputeServices, useDashboardController, useRepositoryDetails, RepoTable, Orgs } from "../../classes/DashboardController";
 
-  
+
 export default function AddRepo() {
-    // UseState
+    // Custom hooks
     const dashboardController = useDashboardController();
     const ComputeServices = useComputeServices();
     const allRepositories = useRepositoryDetails();
 
-    const [selectValue, setSelectValue] = useState<string>("");
+    // state definations
+    // check box selected value
+    const [selectValue, setSelectValue] = useState<string>(""); 
+    
+    // make sure only single check box is checked and others are disabled when one is selected
     const [singleChecked, setSingleChecked] = useState<boolean>(false);
     const [singleCheckedData, setSingleCheckedData] = useState<RepoTable>({"id": "", "name": "", "link": "", "org": ""});
     const [selectComputeService, setSelectComputeService] = useState<string>("");
+
+    // if configure form has missing element, then set error
     const [configureError, setConfigureError] = useState<boolean>(true);
+
+    // organisations under given user
     const [Organizations, setOrganizations] = useState<Array<Orgs>>([]);
     const [searchValue, setSearchValue] = useState("");
     const [submitClicked, setSubmitClicked] = useState(Boolean);
     var [records, setRecords] = useState<Array<RepoTable>>([]);
-
+    
     // Compute Form
     const { isOpen, onOpen, onClose } = useDisclosure();
     const cancelRef = useRef<HTMLDivElement>(null);
@@ -55,16 +62,19 @@ export default function AddRepo() {
         numbers.push(i);
     }
     records = allRepositories.slice(firstIndex, lastIndex);
-
+    
     useEffect(() => {
+        // init the octokit instance for everytime dashboard controller changes
         const octokit = dashboardController.octokit;
 
+        // get logged in user's data
         var js:Array<Orgs> = [];
         octokit.request('GET /user')
             .then(({data})=>{
             js.push({id:data.id.toString(), name:data.login, url:''});
         })
         
+        // get organisations under user
         // user/orgs
         octokit.request('GET /user/orgs')
             .then(({ data }) => {
@@ -76,12 +86,13 @@ export default function AddRepo() {
         });      
         
         setSelectValue("");
-        console.log("filtered records" records);
+        console.log(records);
       }, [dashboardController, submitClicked]);
 
 
     ///////////////////////////////////////////////////////////////////////
     // Components 
+    // updates table entries
     const TableEntries = ({ name, link, id, org }: RepoTable) => {
         if (singleChecked==true && singleCheckedData.name == name){
             return (
@@ -122,55 +133,57 @@ export default function AddRepo() {
         
       };
 
-      const TableData = ({records}:any) => {
-        return(
-            <div>
-                <Table >
-                    <Thead>
-                        <Tr>
-                            <Th>Repository Name</Th>
-                            <Th>Link</Th>
-                        </Tr>
-                    </Thead>
-                    
-                    <Tbody>
-                    {records.map((e:any) => (
-                        <TableEntries
-                        org={e.org}
-                        name={e.name}
-                        key={e.id}
-                        link={e.link}
-                        id={e.id}
-                        />
-                    ))}
-    
-                    </Tbody>
-                </Table>
-    
-                <ul className="pagination">
-                    {numbers.length>0 && 
-                        <li className="page-item">
-                        <Link className="page-link" onClick={prePage}> Prev </Link>
-                    </li>}
-                    
-                    {numbers.map((e:number, i:number) => (
-                        <li key={i} className={`page-item ${currentPage === e ? 'active' : ''}`}>
-                            <Link className="page-link" onClick={() => changePage(e)}> 
-                                {e}
-                            </Link>
-                        </li>
-                    ))}
-    
-                    {numbers.length>0 && 
-                    <li>
-                        <Link className="page-link" onClick={nextPage}> Next </Link>
-                    </li>
-                    }   
-                </ul>
-            </div>
-        )
-    }    
+    // component for representing the table and pagination
+    const TableData = ({records}:any) => {
+    return(
+        <div>
+            <Table >
+                <Thead>
+                    <Tr>
+                        <Th>Repository Name</Th>
+                        <Th>Link</Th>
+                    </Tr>
+                </Thead>
+                
+                <Tbody>
+                {records.map((e:any) => (
+                    <TableEntries
+                    org={e.org}
+                    name={e.name}
+                    key={e.id}
+                    link={e.link}
+                    id={e.id}
+                    />
+                ))}
 
+                </Tbody>
+            </Table>
+
+            <ul className="pagination">
+                {numbers.length>0 && 
+                    <li className="page-item">
+                    <Link className="page-link" onClick={prePage}> Prev </Link>
+                </li>}
+                
+                {numbers.map((e:number, i:number) => (
+                    <li key={i} className={`page-item ${currentPage === e ? 'active' : ''}`}>
+                        <Link className="page-link" onClick={() => changePage(e)}> 
+                            {e}
+                        </Link>
+                    </li>
+                ))}
+
+                {numbers.length>0 && 
+                <li>
+                    <Link className="page-link" onClick={nextPage}> Next </Link>
+                </li>
+                }   
+            </ul>
+        </div>
+    )
+    }
+
+    // Compoonent for selecting compute services
     const SelectComputeEntries = () => {
         return (
             <div>
@@ -181,6 +194,7 @@ export default function AddRepo() {
         )
     }
 
+    // popup message for error message
     const PopupMessage = () => {
         if (configureError == true){
             return(
@@ -211,7 +225,8 @@ export default function AddRepo() {
     }
 
     ///////////////////////////////////////////////////////////////////////
-    //Helpers
+    //Helpers 
+    // handling table cheeckbox
     const handleCheckBox = (id:string, name:string, link:string, org:string) => {
         if (singleChecked == false){
             const data = {
@@ -229,10 +244,12 @@ export default function AddRepo() {
             
     }
 
-    const handleSearch = (() => {
+    // handling search in table
+    const handleSearch = ((e:any) => {
         setSearchValue(e.target.value)
     });
 
+    // handle submit button to search for data
     const handleSearchSubmit = () => {
         var s = searchValue.toLowerCase();
         var temp = [];
@@ -245,6 +262,7 @@ export default function AddRepo() {
         setSubmitClicked(!submitClicked);
     }
 
+    // handle selecting an org/user name and rendering repositories under it
     const handleSelect = async (e:any) => {
         if (e.target.value== ""){
             setSelectValue(""); 
@@ -258,6 +276,7 @@ export default function AddRepo() {
         }
     }
 
+    // handling compute service selection
     const handleComputeSelect = (e:any) => {
         //console.log(e.target);
         if (e.target.value== ""){
@@ -268,6 +287,7 @@ export default function AddRepo() {
         }
     }
 
+    // handle configuration of new repository and compute service along with it
     const handleConfigure = async () => {
         console.log("configure");
                 
@@ -290,6 +310,9 @@ export default function AddRepo() {
         if (currentPage !== firstIndex){
             setCurrentPage(currentPage - 1)
         }
+        else{
+            setCurrentPage(currentPage)
+        }
     }
 
     const changePage = (id:number) => {
@@ -297,9 +320,12 @@ export default function AddRepo() {
     }
 
     const nextPage = () => {
-    if (currentPage !== lastIndex){
-        setCurrentPage(currentPage + 1)
-    }
+        if (currentPage !== lastIndex){
+            setCurrentPage(currentPage + 1)
+        }
+        else{
+            setCurrentPage(currentPage)
+        }
     }
     ///////////////////////////////////////////////////////////////////////
 
