@@ -196,7 +196,7 @@ export default function AddRepo() {
     }
 
     const handleSearch = (() => {
-        console.log("search");
+        //console.log("search");
     });
 
     const handleSelect = async (e:any) => {
