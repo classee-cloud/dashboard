@@ -25,7 +25,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     const refreshConfiguredRepositories = () => 
-    console.log(dashboardController);
+    //console.log(dashboardController);
     const octokit = dashboardController.octokit;
     dashboardController.refreshConfiguredRepositories();
     

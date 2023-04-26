@@ -17,6 +17,7 @@ import { Container,
 import {useDashboardController, ComputeServiceDetails} from "../../classes/DashboardController";
 
 
+// function holds and handles adding new computer service form.
 export default function ComputeServiceForm({login_name}:any) {
     const dashboardController = useDashboardController();
 
@@ -26,19 +27,23 @@ export default function ComputeServiceForm({login_name}:any) {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
 
+    // handling selecting of compute service from drop down form
     const handleSelect = (e:any) => {
         setServiceName(e.target.value);
     }
 
+    // handling email from form
     const handleEmail = (e:any) => {
-        console.log(e.target.value);
+        //console.log(e.target.value);
         setEmail(e.target.value);
     }
 
+    // handling password from form
     const handlePassword = (e:any) => {
         setPassword(e.target.value);
     }
 
+    // handling email validation
     const validateEmail = (email:string) => {
         return String(email)
           .toLowerCase()
@@ -47,6 +52,7 @@ export default function ComputeServiceForm({login_name}:any) {
           );
       };
 
+    // handling submission to database
     const handleSubmit = async () => {
         // check if email is valid
         if (validateEmail(email) && password != ""){
@@ -63,7 +69,6 @@ export default function ComputeServiceForm({login_name}:any) {
         else{
             setError(true);
         }
-
     }
 
     return(
