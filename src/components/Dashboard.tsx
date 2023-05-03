@@ -16,19 +16,24 @@ import {
 import { Octokit } from "octokit";
 import { useDashboardController, useConfiguredRepositoryDetails ,TableItems } from "../classes/DashboardController";
 import {useNavigate} from 'react-router-dom';
+import { Spinner } from '@chakra-ui/react'
 
 
 export default function Dashboard() {
   const dashboardController = useDashboardController();
   const navigate = useNavigate();
   const GitData = useConfiguredRepositoryDetails();
+  const [loading, setLoading] = useState(false) //set to true is loading is to be present by default initally
+
+
 
   useEffect(() => {
     const refreshConfiguredRepositories = () => 
     //console.log(dashboardController);
     const octokit = dashboardController.octokit;
     dashboardController.refreshConfiguredRepositories();
-    
+    //setTimeout(() => setLoading(false), 100) // removing temporarily 
+
     /*
     if (GitData.length==0){
       octokit.request('GET /user')
@@ -79,8 +84,9 @@ export default function Dashboard() {
   
   return (
     <div style={{ color: "blue" }}>
+      {loading === true && <Spinner/> }
+      {loading === false &&
       <Container>
-
         <Button colorScheme="blue" onClick={navigateHome}>Add and Configure New Repository</Button>
         <br />
         <br />
@@ -89,7 +95,7 @@ export default function Dashboard() {
         <h2> Configured Github Repositories </h2>
         <br />
 
-        {GitData.length <=0 && <h1>loading...</h1>}
+        {GitData.length <=0 && <h1>No repositories configured. Configure new reposistory..</h1>}
         {GitData.length >0 &&
         <TableContainer>
           <Table variant="simple">
@@ -121,6 +127,7 @@ export default function Dashboard() {
         }
 
       </Container>
+    }
     </div>
   );
 }
