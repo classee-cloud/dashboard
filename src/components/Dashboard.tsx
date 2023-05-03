@@ -23,7 +23,7 @@ export default function Dashboard() {
   const dashboardController = useDashboardController();
   const navigate = useNavigate();
   const GitData = useConfiguredRepositoryDetails();
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) //set to true is loading is to be present by default initally
 
 
 
@@ -32,7 +32,7 @@ export default function Dashboard() {
     console.log(dashboardController);
     const octokit = dashboardController.octokit;
     dashboardController.refreshConfiguredRepositories();
-    setTimeout(() => setLoading(false), 100)
+    //setTimeout(() => setLoading(false), 100) // removing temporarily 
 
     /*
     if (GitData.length==0){
