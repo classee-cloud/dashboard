@@ -16,19 +16,34 @@ import {
 import { Octokit } from "octokit";
 import { useDashboardController, useConfiguredRepositoryDetails ,TableItems } from "../classes/DashboardController";
 import {useNavigate} from 'react-router-dom';
+import { Spinner } from '@chakra-ui/react'
 
 
 export default function Dashboard() {
   const dashboardController = useDashboardController();
   const navigate = useNavigate();
   const GitData = useConfiguredRepositoryDetails();
+  const [loading, setLoading] = useState(false)
+
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
+  const lastIndex = currentPage * recordsPerPage;
+  const firstIndex = lastIndex - recordsPerPage;
+  const records = GitData.slice(firstIndex, lastIndex);
+  const npage = Math.ceil(GitData.length / recordsPerPage);
+  var numbers:Array<number> = [];
+  for (var i=1; i<=npage; i++){
+      numbers.push(i);
+  }
 
   useEffect(() => {
-    const refreshConfiguredRepositories = () => 
-    //console.log(dashboardController);
+    //const refreshConfiguredRepositories = () => 
+    console.log(dashboardController);
     const octokit = dashboardController.octokit;
     dashboardController.refreshConfiguredRepositories();
-    
+    //setTimeout(() => setLoading(false), 100)
+
     /*
     if (GitData.length==0){
       octokit.request('GET /user')
@@ -76,11 +91,34 @@ export default function Dashboard() {
     // 👇️ navigate to /
     navigate('/AddRepo');
   };
+
+  const prePage = () => {
+    if (currentPage !== firstIndex){
+        setCurrentPage(currentPage - 1)
+    }
+    else{
+      setCurrentPage(currentPage)
+    }
+  }
+
+  const changePage = (id:number) => {
+      setCurrentPage(id)
+  }
+
+  const nextPage = () => {
+    if (currentPage !== lastIndex){
+        setCurrentPage(currentPage + 1)
+    }
+    else{
+      setCurrentPage(currentPage)
+    }
+  }
   
   return (
     <div style={{ color: "blue" }}>
+      {loading === true && <Spinner/> }
+      {loading === false &&
       <Container>
-
         <Button colorScheme="blue" onClick={navigateHome}>Add and Configure New Repository</Button>
         <br />
         <br />
@@ -89,7 +127,7 @@ export default function Dashboard() {
         <h2> Configured Github Repositories </h2>
         <br />
 
-        {GitData.length <=0 && <h1>loading...</h1>}
+        {GitData.length <=0 && <h1>No repositories Configured...</h1>}
         {GitData.length >0 &&
         <TableContainer>
           <Table variant="simple">
@@ -104,7 +142,7 @@ export default function Dashboard() {
             </Thead>
 
             <Tbody>
-              {GitData.map((e) => (
+              {records.map((e) => (
                 <TableEntries
                   name={e.name}
                   link={e.link}
@@ -117,10 +155,22 @@ export default function Dashboard() {
               ))}
             </Tbody>
           </Table>
+          
+          <br/>
+          <ul className="pagination">
+            {numbers.map((e:number, i:number) => (
+                <li key={i} className={`page-item ${currentPage === e ? 'active' : ''}`}>
+                    <Link className="page-link" onClick={() => changePage(e)}> 
+                        {e}
+                    </Link>
+                </li>
+            ))} 
+          </ul>
         </TableContainer>
         }
 
       </Container>
+    }
     </div>
   );
 }

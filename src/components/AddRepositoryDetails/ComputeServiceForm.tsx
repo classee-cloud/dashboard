@@ -34,7 +34,7 @@ export default function ComputeServiceForm({login_name}:any) {
 
     // handling email from form
     const handleEmail = (e:any) => {
-        //console.log(e.target.value);
+        console.log(e.target.value);
         setEmail(e.target.value);
     }
 

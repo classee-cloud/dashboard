@@ -49,7 +49,6 @@ interface MobileProps extends FlexProps {
 }
 
 // -------------------------------------------------------
-
 const LinkItems: Array<LinkItemProps> = [
   { name: "My Dashboard", icon: FiHome, path: "/dashboard/" },
   { name: "About", icon: FiCompass, path: "/About" },
@@ -61,7 +60,7 @@ const NavItem = ({ icon, children, path, index, ...rest }: NavItemProps) => {
       href={path}
       style={{ textDecoration: "none" }}
       _focus={{ boxShadow: "none" }}
-    >
+      >
       <Flex
         align="center"
         p="4"
@@ -74,7 +73,7 @@ const NavItem = ({ icon, children, path, index, ...rest }: NavItemProps) => {
           color: "white",
         }}
         {...rest}
-      >
+        >
         {icon && (
           <Icon
             mr="4"
